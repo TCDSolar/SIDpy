@@ -12,8 +12,6 @@ from configparser import ConfigParser
 
 # Initialize config file
 config_object = ConfigParser()
-config_object.read("config.ini")
+config_object.read("config/config.ini")
 config_data, config_archive = (config_object['PARAMETERS']['data_path'],
-                           config_object['PARAMETERS']['archive_path'])
-
-
+                               config_object['PARAMETERS']['archive_path'])

@@ -10,23 +10,22 @@ and archive them accordingly. The default structure of the archive is
 """
 
 import os
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 from read_config import config_archive
 
 
-class Archiver: 
+class Archiver:
     """
     Class used to generate archive structure, specify paths of newly processed
     files and archive them accordingly. The default structure of the archive
     is {site}/YYYY/MM/DD/{file_type}/.
     """
-    
+
     def __init__(self, temp_data_path):
         self.temp_data_path = temp_data_path
-    
-    
+
     def archive(self, parameters_dict):
         """
         Archives given file into the appropriate location.
@@ -44,13 +43,12 @@ class Archiver:
         """
         path_info = self.get_path_info(parameters_dict)
         image_path, data_path = self.create_path(path_info)
-        archive_dict = {'path_info' : path_info,
-                        'image_path' : image_path,
-                        'data_path' : data_path,
-                        'temp_path' : self.temp_data_path}
-        return archive_dict        
-               
-    
+        archive_dict = {'path_info': path_info,
+                        'image_path': image_path,
+                        'data_path': data_path,
+                        'temp_path': self.temp_data_path}
+        return archive_dict
+
     def get_path_info(self, parameters_dict):
         """
         Strip csv file name for appropriate path info, in order to generate
@@ -68,14 +66,13 @@ class Archiver:
         """
         start_time = datetime.strptime(parameters_dict['UTC_StartTime'],
                                        '%Y-%m-%d%H:%M:%S')
-        path_info = {'transmitter' : parameters_dict['StationID'],
-                     'site' : parameters_dict['Site'],
-                     'year' : start_time.year,
-                     'month' : start_time.month,
-                     'day' : start_time.day}
+        path_info = {'transmitter': parameters_dict['StationID'],
+                     'site': parameters_dict['Site'],
+                     'year': start_time.year,
+                     'month': start_time.month,
+                     'day': start_time.day}
         return path_info
-    
-    
+
     def create_path(self, path_info):
         """
         Ensure the archive structure in generated before saving files, if not
@@ -94,24 +91,20 @@ class Archiver:
         """
         if path_info['site'] == 'Dunsink':
             file_path = (Path(config_archive) /
-                         'dunsink' / 
-                         str(path_info['year']) / 
-                         str(path_info['month']) / 
+                         'dunsink' /
+                         str(path_info['year']) /
+                         str(path_info['month']) /
                          str(path_info['day']))
         else:
-            file_path = (Path(config_archive) / 
-                         'birr' / 
-                         str(path_info['year']) / 
-                         str(path_info['month']) / 
-                         str(path_info['day'])) 
-        
+            file_path = (Path(config_archive) /
+                         'birr' /
+                         str(path_info['year']) /
+                         str(path_info['month']) /
+                         str(path_info['day']))
+
         image_path, data_path = file_path / 'png', file_path / 'csv'
         if not os.path.exists(image_path):
             os.system('mkdir ' + str(image_path))
         if not os.path.exists(data_path):
             os.system('mkdir ' + str(data_path))
         return image_path, data_path
-
-
-
-

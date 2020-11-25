@@ -10,6 +10,7 @@ midpoint.
 """
 
 import math
+
 from solartime import SolarTime
 
 
@@ -17,8 +18,7 @@ class Geographic_Midpoint:
     """ Calculate the weighted geographic midpoint and sunrise/sunset times 
     between a set of given lat and lon values.
     """
-    
-    
+
     def calc_midpoint(self, point1, point2):
         """
         Calculate the geographic midpoint for two points
@@ -42,7 +42,6 @@ class Geographic_Midpoint:
         midpoint = self.to_latlon(x, y, z)
         return midpoint
 
-
     def to_cart(self, lat, lon):
         """
         Convert lat and lon to 3D cartesian coords.
@@ -60,16 +59,15 @@ class Geographic_Midpoint:
             Cartessian coords; x, y, z.
 
         """
-        lat = lat*math.pi/180
-        lon = lon*math.pi/180
-        x = math.cos(lat)*math.cos(lon)
-        y = math.cos(lat)*math.sin(lon)
+        lat = lat * math.pi / 180
+        lon = lon * math.pi / 180
+        x = math.cos(lat) * math.cos(lon)
+        y = math.cos(lat) * math.sin(lon)
         z = math.sin(lat)
         cart = [x, y, z]
         return cart
 
-
-    def weighted_avg_coord(self, point1, point2, w1 = 1, w2 = 1):
+    def weighted_avg_coord(self, point1, point2, w1=1, w2=1):
         """
         Find mean of two 3D cartessian points,
         this may be weighted using w1 & w2. 
@@ -95,11 +93,10 @@ class Geographic_Midpoint:
             Z position.
 
         """
-        x = (point1[0]*w1 + point2[0]*w2)/(w1+w2)
-        y = (point1[1]*w1 + point2[1]*w2)/(w1+w2)
-        z = (point1[2]*w1 + point2[2]*w2)/(w1+w2)
+        x = (point1[0] * w1 + point2[0] * w2) / (w1 + w2)
+        y = (point1[1] * w1 + point2[1] * w2) / (w1 + w2)
+        z = (point1[2] * w1 + point2[2] * w2) / (w1 + w2)
         return x, y, z
-
 
     def to_latlon(self, x, y, z):
         """
@@ -123,12 +120,12 @@ class Geographic_Midpoint:
 
         """
         lon = math.atan2(y, x)
-        hyp = math.sqrt(x*x+y*y)
+        hyp = math.sqrt(x * x + y * y)
         lat = math.atan2(z, hyp)
-        lat = lat*180/math.pi
-        lon = lon*180/math.pi
+        lat = lat * 180 / math.pi
+        lon = lon * 180 / math.pi
         return lat, lon
-    
+
     def sunrise_sunset(self, date, lat, lon):
         """
         Calculate sunrise and sunset times in utc for given date,
@@ -152,6 +149,6 @@ class Geographic_Midpoint:
         """
         sun = SolarTime()
         schedule = sun.sun_utc(date, lat, lon)
-        sunset  = schedule['sunset']
+        sunset = schedule['sunset']
         sunrise = schedule['sunrise']
         return sunrise, sunset

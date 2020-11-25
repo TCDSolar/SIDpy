@@ -9,13 +9,13 @@ their specified locations.
     oharao@tcd.ie
 """
 
-import shutil
 import os
+import shutil
 from pathlib import Path
 
-from vlfclient import VLFClient 
-from supersid_archiver import Archiver
 from read_config import config_data, config_archive
+from supersid_archiver import Archiver
+from vlfclient import VLFClient
 
 
 def process_file(file):
@@ -44,14 +44,14 @@ def process_file(file):
         archive_dict = archiver.archive(header)
         shutil.move(temp_image_path,
                     Path(config_archive) / str(archive_dict['image_path']
-                    / (file[len(config_data)+1:-4] + '.png')))
+                                               / (file[len(config_data) + 1:-4] + '.png')))
         shutil.move(file,
                     Path(config_archive) / str(archive_dict['data_path']
-                    / file[len(config_data)+1:]))
+                                               / file[len(config_data) + 1:]))
         return True, temp_image_path
     else:
         return False, None
-    
+
 
 def process_directory():
     """
@@ -69,11 +69,11 @@ def process_directory():
     # vlfclient = VLFClient()
     # vlfclient.summary_plot()
     for file in os.listdir(config_data):
-        status, temp_image = process_file(config_data +"/" + file)
+        status, temp_image = process_file(config_data + "/" + file)
         if status == True:
             print(file, ": Has been processed and archived.")
         else:
             print(file, ": Could not be processed, please try again later.")
-            
-            
+
+
 process_directory()
