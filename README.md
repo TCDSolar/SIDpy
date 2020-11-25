@@ -1,7 +1,7 @@
 # SuperSid_Scripts
 Collection of Python scripts used to process and archive data from the SuperSIDs at Birr and Dunsink.  
 
-Designed to be run on Windows 10. Required Anaconda3.
+Designed to be run on Windows 10. Requires Anaconda3.
 
 The scripts may be automatically ran using Windows Task Scheduler. To do this, the processing_script.bat needs to be configured.
 
