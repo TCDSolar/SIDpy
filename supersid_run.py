@@ -1,6 +1,6 @@
 """
 Process all csv data found within the data path specified in config.cfg, 
-verifies and creates archive structure before saving the coresponding files to
+verifies and creates archive structure before saving the corresponding files to
 their specified locations.
 
 @author: 
@@ -66,8 +66,9 @@ def process_directory():
     -------
     None
     """
-    # vlfclient = VLFClient()
-    # vlfclient.summary_plot()
+    vlfclient, archiver = VLFClient(), Archiver(temp_data_path=None)
+    archiver.static_summary_path()
+    vlfclient.summary_plot()
     for file in os.listdir(config_data):
         status, temp_image = process_file(config_data + "/" + file)
         if status == True:

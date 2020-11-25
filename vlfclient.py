@@ -21,7 +21,7 @@ from matplotlib import dates
 from sunpy.time import parse_time
 
 from geographic_midpoint import Geographic_Midpoint
-from read_config import config_data
+from read_config import config_data, config_archive
 from vlf_transmitter_dict import transmitters
 
 
@@ -180,8 +180,13 @@ class VLFClient:
     def get_recent_goes(self):
         """
         Pull the most recent GOES X-ray data from the NOAA page
-        
-        Returns the GOES short and long channels as pandas series
+
+        Returns
+        -------
+        gl : pd.DataFrame object
+                The GOES long channels as pandas series
+        gs : pd.DataFrame object
+                The GOES short channels as pandas series
         """
         data = pd.read_json("https://services.swpc.noaa.gov/json" +
                             "/goes/primary/xrays-7-day.json")
@@ -198,63 +203,52 @@ class VLFClient:
         """
         Create summary plot of all data for specified site. This is currently 
         a Work In Progress (WIP).
-        
-        """
-        tstart = datetime(2020, 11, 8, 00, 00)
 
-        dunsink = []
-        birr = []
-        for file in os.listdir('temp'):
-            dataframe = self.read_csv('temp/' + file)
+        Returns
+        -------
+
+        """
+
+        for file in os.listdir(config_data):
+            dataframe = self.read_csv(config_data + '/' + file)
             header, data = self.get_header(dataframe), self.get_data(dataframe)
+
+            gl, gs = self.get_recent_goes()
+            fig, ax = plt.subplots(2, sharex=True, figsize=(9, 6))
+
+            t_start = datetime.utcnow() - timedelta(hours=4)
+            t_end = t_start + timedelta(hours=5)
+
+            sid = pd.Series(data['signal_strength'].values,
+                            index=pd.to_datetime(data['datetime']))
+            ax[0].plot(sid, color='k', label=header['StationID'])
+
+            ax[0].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))
+
+            ax[1].plot(gl, color='r', label='Goes long')
+            ax[1].plot(gs, color='b', label='Goes short')
+            ax[1].set(yscale='log', ylim=[10 ** -9, 10 ** -2])
+
+            for a in ax:
+                for t in [1, 2, 3, 4, 5]:
+                    a.axvline(t_start.replace(minute=0, second=0, microsecond=0) + timedelta(hours=t),
+                              color="grey", ls="dashed")
+                a.set_xlim(t_start, t_end)
+                a.tick_params(which="both", direction="in")
+                a.legend()
+
+            ax[0].set_ylabel("Signal strength (dB)")
+            ax[1].set_ylabel("Flux Wm$^{-2}$")
+            ax[1].set_xlabel("Time " + t_start.strftime("%m/%d/%Y"))
+
+            ax[1].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))
+
+            plt.tight_layout()
+            plt.subplots_adjust(hspace=0.01)
+
             if 'Dunsink' in file:
-                dunsink.append([header, data])
+                summary_path = config_archive + '/dunsink/summary/' + header['StationID']
             else:
-                birr.append([header, data])
-        gl, gs = self.get_recent_goes()
+                summary_path = config_archive + '/birr/summary/' + header['StationID']
 
-        fig, ax = plt.subplots(1, sharex=True, figsize=(9, 12))
-        colours = ['y', 'b', 'g', 'r', 'c', 'm']
-
-        # plot the VLF data
-        for transmitter, c in zip(dunsink, colours):
-            sid = pd.Series(transmitter[1]['signal_strength'].values,
-                            index=pd.to_datetime(transmitter[1]['datetime']))
-            ax[0].plot(sid, label=transmitter[0]['StationID'], color=c)
-        ax[0].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))
-        ax[0].legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
-
-        """
-        for transmitter, c in zip(birr, colours):
-            sid = pd.Series(transmitter[1]['signal_strength'].values,
-            index=pd.to_datetime(transmitter[1]['datetime']))
-            ax[2].plot(sid, label=transmitter[0]['StationID'], color=c)
-        ax[2].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))
-        ax[2].legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
-        
-        # plot the GOES data
-        ax[1].plot(gl, color='r')
-        ax[1].plot(gs, color='b')
-        ax[1].set(yscale='log', ylim=[10 ** -9, 10 ** -2])
-        """
-
-        times = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]
-
-        for a in ax:
-            for t in times:
-                a.axvline(tstart + timedelta(hours=t),
-                          color="grey", ls="dashed")
-            a.tick_params(which="both", direction="in")
-
-        ax[0].set_ylabel("Dunsink signal strength (dB)")
-        # ax[2].set_ylabel("Birr signal strength (dB)")
-        # ax[1].set_ylabel("Flux Wm$^{-2}$")
-        # ax[1].set_xlabel("Time " + tstart.strftime("%m/%d/%Y"))
-
-        # ax[1].set_xlim(tstart, tend)
-        # ax[1].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))
-
-        plt.tight_layout()
-        plt.subplots_adjust(hspace=0.01)
-
-        plt.savefig("data/summary/" + file[:-4], dpi=200)
+            plt.savefig(summary_path, dpi=200)

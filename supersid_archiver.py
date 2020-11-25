@@ -76,7 +76,7 @@ class Archiver:
     def create_path(self, path_info):
         """
         Ensure the archive structure in generated before saving files, if not
-        it is created in the appripriate format. 
+        it is created in the appropriate format.
 
         Parameters
         ----------
@@ -108,3 +108,17 @@ class Archiver:
         if not os.path.exists(data_path):
             os.system('mkdir ' + str(data_path))
         return image_path, data_path
+
+    def static_summary_path(self):
+        """
+        Verifies and generates static paths for both Dunsink and Birr summary
+        plots.
+        """
+        bir_summary = (Path(config_archive) /
+                       'birr' / 'summary')
+        dun_summary = (Path(config_archive) /
+                       'dunsink' / 'summary')
+        if not os.path.exists(bir_summary):
+            os.system('mkdir ' + str(bir_summary))
+        if not os.path.exists(dun_summary):
+            os.system('mkdir ' + str(dun_summary))

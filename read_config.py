@@ -1,5 +1,5 @@
 """
-Read configuration file config.ini contents before intalizing the contained 
+Read configuration file config.ini contents before initializing the contained
 variables as a dependency to avoid circular imports.
 
 @author: 
