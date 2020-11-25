@@ -1,13 +1,19 @@
 """
-Created on Sat Oct 24 18:41:42 2020
+Verify and generate archive structure, specify paths of newly processed files 
+and archive them accordingly. The default structure of the archive is 
+{site}/YYYY/MM/DD/{file_type}/.
 
-@author: oharao@tcd.ie
+@author:
+    Oscar Sage David O'Hara
+@email:
+    oharao@tcd.ie
 """
 
 import os
 from pathlib import Path
 from datetime import datetime
-from supersid_config import archive_path as config_archive
+
+from read_config import config_archive
 
 
 class Archiver: 

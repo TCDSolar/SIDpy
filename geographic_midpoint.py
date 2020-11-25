@@ -1,14 +1,21 @@
 """
-Created on Sun Oct 25 12:23:38 2020
+Calculate the weighted geographic midpoint between a set of given lat and lon
+values. The sunrise and snset times are then calculated at the geographic
+midpoint.
 
-@author: oharao@tcd.ie
+@author: 
+    Oscar Sage David O'Hara
+@email: 
+    oharao@tcd.ie
 """
+
 import math
 from solartime import SolarTime
 
 
 class Geographic_Midpoint:
-    """
+    """ Calculate the weighted geographic midpoint and sunrise/sunset times 
+    between a set of given lat and lon values.
     """
     
     

@@ -1,21 +1,28 @@
 """
-Created on Fri Oct  2 12:10:27 2020
+Client containing functions specific to the processing of SuperSID VLF data; 
+reading csv files, get data from csv, get header information from csv, 
+normalize data, convert data to pandas dataframe, plot data and create summary
+plot.
 
-@author: oharao@tcd.ie
+@author: 
+    Oscar Sage David O'Hara
+@email: 
+    oharao@tcd.ie
 """
 
-import matplotlib.pyplot as plt
-from matplotlib import dates
 import pandas as pd
-from pathlib import Path
-from geographic_midpoint import Geographic_Midpoint
-from transmitter_dict import transmitters
-from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
 import numpy as np
-from scipy.signal import savgol_filter
 import os
+from matplotlib import dates
+from pathlib import Path
+from datetime import datetime, timedelta
 from sunpy.time import parse_time
-from supersid_config import data_path as config_data
+
+from read_config import config_data
+from geographic_midpoint import Geographic_Midpoint
+from vlf_transmitter_dict import transmitters
+
 
 class VLFClient:
     """
@@ -127,24 +134,6 @@ class VLFClient:
         df['signal_strength'] = 20*np.log10(df['signal_strength'])
         return df
     
-    
-    def filter_data(self, df):
-        """
-        
-
-        Parameters
-        ----------
-        df : TYPE
-            DESCRIPTION.
-
-        Returns
-        -------
-        None.
-
-        """
-        df['signal_strength'] = savgol_filter(df['signal_strength'], 7, 3)
-        return df
-    
         
     def create_plot(self, parameters, data, file_path):
         """
@@ -215,7 +204,8 @@ class VLFClient:
     
     def summary_plot(self):
         """
-        Create summary plot of all data for specified site. WIP.
+        Create summary plot of all data for specified site. This is currently 
+        a Work In Progress (WIP).
         
         """
         tstart = datetime(2020, 11, 8, 00, 00)

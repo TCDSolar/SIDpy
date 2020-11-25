@@ -1,10 +1,14 @@
 """
-Created on Sun Oct 25 19:54:08 2020
+Dictionary containing list of currently used transmitters codes, with their
+corresponding latitude and longitude. Used to specify transmitter from file
+header and calculate sunrise and sunset times.
 
-@author: oharao@tcd.ie
+@author: 
+    Oscar Sage David O'Hara
+@email: 
+    oharao@tcd.ie
 """
 
-# Dict of transmitter being observed and their corresponding lat and lon.
 transmitters = {'JJI' : [32.082, 130.828],
                 'NDT' : [32.082, 130.828],
                 'NAA' : [44.644, -67.282],

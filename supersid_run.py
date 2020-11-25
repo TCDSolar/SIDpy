@@ -1,15 +1,21 @@
 """
-Created on Sat Oct 24 13:49:31 2020
+Process all csv data found within the data path specified in config.cfg, 
+verifies and creates archive structure before saving the coresponding files to
+their specified locations.
 
-@author: oscar
+@author: 
+    Oscar Sage David O'Hara
+@email: 
+    oharao@tcd.ie
 """
 
-from vlfclient import VLFClient 
-from archiver import Archiver
-from pathlib import Path
 import shutil
 import os
-from supersid_config import data_path as config_data, archive_path as config_archive
+from pathlib import Path
+
+from vlfclient import VLFClient 
+from supersid_archiver import Archiver
+from read_config import config_data, config_archive
 
 
 def process_file(file):
@@ -47,10 +53,10 @@ def process_file(file):
         return False, None
     
 
-def run_hourly():
+def process_directory():
     """
     Function to be run hourly in order to process and archive all files listed
-    within the data_path specified within supersid_config.py. 
+    within the data_path specified within config.cfg. 
     
     Parameters
     ----------
@@ -69,4 +75,5 @@ def run_hourly():
         else:
             print(file, ": Could not be processed, please try again later.")
             
-run_hourly()
+            
+process_directory()
