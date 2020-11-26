@@ -21,7 +21,7 @@ from vlfclient import VLFClient
 def process_file(file):
     """
     Process single given csv file meeting the appropriate criteria. Before 
-    saving the conresponding png and input csv to the appropriate archive
+    saving the corresponding png and input csv to the appropriate archive
     location.
     
     Parameters
@@ -32,7 +32,7 @@ def process_file(file):
     Returns
     -------
     temp_image_path : str
-        Tempory path of generated png.
+        Temporary path of generated png.
     """
     if file.endswith('.csv') and not file.__contains__("current") and not file.__contains__(" "):
         vlfclient = VLFClient()
