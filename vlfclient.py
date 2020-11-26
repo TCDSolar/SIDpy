@@ -210,45 +210,46 @@ class VLFClient:
         """
 
         for file in os.listdir(config_data):
-            dataframe = self.read_csv(config_data + '/' + file)
-            header, data = self.get_header(dataframe), self.get_data(dataframe)
+            if file.endswith('.csv') and not file.__contains__("current") and not file.__contains__(" "):
+                dataframe = self.read_csv(config_data + '/' + file)
+                header, data = self.get_header(dataframe), self.get_data(dataframe)
 
-            gl, gs = self.get_recent_goes()
-            fig, ax = plt.subplots(2, sharex=True, figsize=(9, 6))
+                gl, gs = self.get_recent_goes()
+                fig, ax = plt.subplots(2, sharex=True, figsize=(9, 6))
 
-            t_start = datetime.utcnow() - timedelta(hours=4)
-            t_end = t_start + timedelta(hours=5)
+                t_start = datetime.utcnow() - timedelta(hours=4)
+                t_end = t_start + timedelta(hours=5)
 
-            sid = pd.Series(data['signal_strength'].values,
-                            index=pd.to_datetime(data['datetime']))
-            ax[0].plot(sid, color='k', label=header['StationID'])
+                sid = pd.Series(data['signal_strength'].values,
+                                index=pd.to_datetime(data['datetime']))
+                ax[0].plot(sid, color='k', label=header['StationID'])
 
-            ax[0].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))
+                ax[0].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))
 
-            ax[1].plot(gl, color='r', label='Goes long')
-            ax[1].plot(gs, color='b', label='Goes short')
-            ax[1].set(yscale='log', ylim=[10 ** -9, 10 ** -2])
+                ax[1].plot(gl, color='r', label='Goes long')
+                ax[1].plot(gs, color='b', label='Goes short')
+                ax[1].set(yscale='log', ylim=[10 ** -9, 10 ** -2])
 
-            for a in ax:
-                for t in [1, 2, 3, 4, 5]:
-                    a.axvline(t_start.replace(minute=0, second=0, microsecond=0) + timedelta(hours=t),
-                              color="grey", ls="dashed")
-                a.set_xlim(t_start, t_end)
-                a.tick_params(which="both", direction="in")
-                a.legend()
+                for a in ax:
+                    for t in [1, 2, 3, 4, 5]:
+                        a.axvline(t_start.replace(minute=0, second=0, microsecond=0) + timedelta(hours=t),
+                                  color="grey", ls="dashed")
+                    a.set_xlim(t_start, t_end)
+                    a.tick_params(which="both", direction="in")
+                    a.legend()
 
-            ax[0].set_ylabel("Signal strength (dB)")
-            ax[1].set_ylabel("Flux Wm$^{-2}$")
-            ax[1].set_xlabel("Time " + t_start.strftime("%m/%d/%Y"))
+                ax[0].set_ylabel("Signal strength (dB)")
+                ax[1].set_ylabel("Flux Wm$^{-2}$")
+                ax[1].set_xlabel("Time " + t_start.strftime("%m/%d/%Y"))
 
-            ax[1].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))
+                ax[1].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))
 
-            plt.tight_layout()
-            plt.subplots_adjust(hspace=0.01)
+                plt.tight_layout()
+                plt.subplots_adjust(hspace=0.01)
 
-            if 'Dunsink' in file:
-                summary_path = config_archive + '/dunsink/summary/' + header['StationID']
-            else:
-                summary_path = config_archive + '/birr/summary/' + header['StationID']
+                if 'Dunsink' in file:
+                    summary_path = config_archive + '/dunsink/summary/' + header['StationID']
+                else:
+                    summary_path = config_archive + '/birr/summary/' + header['StationID']
 
-            plt.savefig(summary_path, dpi=200)
+                plt.savefig(summary_path, dpi=200)
