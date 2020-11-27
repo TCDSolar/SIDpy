@@ -1,7 +1,0 @@
-matplotlib==3.2.2
-pandas==1.0.5
-pathlib==1.0.1
-numpy==1.18.5
-scipy==1.5.0
-sunpy==2.0.3
-solartime==0.1b1
