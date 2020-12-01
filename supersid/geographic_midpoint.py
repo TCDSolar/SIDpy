@@ -11,7 +11,7 @@ midpoint.
 
 import math
 
-from solartime import SolarTime
+import astral
 
 
 class Geographic_Midpoint:
@@ -147,8 +147,7 @@ class Geographic_Midpoint:
         sunset : datetime
             Sunset time.
         """
-        sun = SolarTime()
-        schedule = sun.sun_utc(date, lat, lon)
-        sunset = schedule['sunset']
-        sunrise = schedule['sunrise']
+        astra = astral.Astral()
+        sunrise = astra.sunrise_utc(date, lat, lon)
+        sunset = astra.sunset_utc(date, lat, lon)
         return sunrise, sunset

@@ -61,7 +61,7 @@ jobs:
       targets:
 #        - wheels_linux
 #        - wheels_macos
-#        - sdist
+        - sdist
       dependsOn:
         - py37_mac
         - py37_win
