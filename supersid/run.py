@@ -13,8 +13,8 @@ import os
 import shutil
 from pathlib import Path
 
-from supersid.config.read_config import config_data, config_archive
-from supersid.supersid_archiver import Archiver
+from supersid.config.config import data_path as config_data, archive_path as config_archive
+from supersid.archiver import Archiver
 from supersid.vlfclient import VLFClient
 
 
@@ -43,11 +43,11 @@ def process_file(file):
         temp_image_path = vlfclient.create_plot(header, data, file)
         archive_dict = archiver.archive(header)
         shutil.move(temp_image_path,
-                    Path(config_archive) / str(archive_dict['image_path']
-                                               / (file[len(config_data) + 1:-4] + '.png')))
+                    Path(config_archive) / str(archive_dict['image_path'])
+                                               / (file[len(config_data) + 1:-4] + '.png'))
         shutil.move(file,
-                    Path(config_archive) / str(archive_dict['data_path']
-                                               / file[len(config_data) + 1:]))
+                    Path(config_archive) / str(archive_dict['data_path'])
+                                               / file[len(config_data) + 1:])
         return True, temp_image_path
     else:
         return False, None

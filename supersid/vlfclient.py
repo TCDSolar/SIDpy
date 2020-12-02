@@ -19,9 +19,8 @@ import numpy as np
 import pandas as pd
 from supersid.geographic_midpoint.geographic_midpoint import Geographic_Midpoint
 from matplotlib import dates
-from supersid.config.read_config import config_data, config_archive
+from supersid.config.config import data_path as config_data, archive_path as config_archive, transmitters
 from sunpy.time import parse_time
-from supersid.transmitters.vlf_transmitters import transmitters
 
 
 class VLFClient:
@@ -161,7 +160,7 @@ class VLFClient:
                                           '%Y-%m-%d%H:%M:%S')
         latlon = geo.calc_midpoint([float(parameters['Latitude']),
                                     float(parameters['Longitude'])],
-                                   transmitters[parameters['StationID']])
+                                   eval(transmitters[parameters['StationID']]))
         sunrise, sunset = geo.sunrise_sunset(date_time_obj.date(), latlon[0],
                                              latlon[1])
         ax1.axvspan(sunrise - timedelta(hours=1), sunrise + timedelta(hours=1),

@@ -13,7 +13,7 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-from supersid.config.read_config import config_archive
+from supersid.config.config import archive_path as config_archive
 
 
 class Archiver:
@@ -114,10 +114,8 @@ class Archiver:
         Verifies and generates static paths for Dunsink and Birr summary
         plots.
         """
-        bir_summary = (Path(config_archive) /
-                       'birr' / 'summary')
-        dun_summary = (Path(config_archive) /
-                       'dunsink' / 'summary')
+        bir_summary = (Path(config_archive) / 'birr' / 'summary')
+        dun_summary = (Path(config_archive) / 'dunsink' / 'summary')
         if not os.path.exists(bir_summary):
             os.system('mkdir ' + str(bir_summary))
         if not os.path.exists(dun_summary):

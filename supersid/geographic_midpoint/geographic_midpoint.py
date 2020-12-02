@@ -59,8 +59,8 @@ class Geographic_Midpoint:
             Cartessian coords; x, y, z.
 
         """
-        lat = lat * math.pi / 180
-        lon = lon * math.pi / 180
+        lat = lat * math.pi / 180.0
+        lon = lon * math.pi / 180.0
         x = math.cos(lat) * math.cos(lon)
         y = math.cos(lat) * math.sin(lon)
         z = math.sin(lat)
@@ -122,15 +122,14 @@ class Geographic_Midpoint:
         lon = math.atan2(y, x)
         hyp = math.sqrt(x * x + y * y)
         lat = math.atan2(z, hyp)
-        lat = lat * 180 / math.pi
-        lon = lon * 180 / math.pi
+        lat = lat * 180.0 / math.pi
+        lon = lon * 180.0 / math.pi
         return lat, lon
 
     def sunrise_sunset(self, date, lat, lon):
         """
         Calculate sunrise and sunset times in utc for given date,
         lat and lon.
-
         Parameters
         ----------
         date : datetime.date
@@ -139,7 +138,6 @@ class Geographic_Midpoint:
             Latitude.
         lon : int
             Longitude.
-
         Returns
         -------
         sunrise : datetime
