@@ -13,7 +13,7 @@ import os
 import shutil
 from pathlib import Path
 
-from supersid.read_config import config_data, config_archive
+from supersid.config.read_config import config_data, config_archive
 from supersid.supersid_archiver import Archiver
 from supersid.vlfclient import VLFClient
 

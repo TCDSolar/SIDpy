@@ -17,11 +17,11 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from supersid.geographic_midpoint import Geographic_Midpoint
+from supersid.geographic_midpoint.geographic_midpoint import Geographic_Midpoint
 from matplotlib import dates
-from supersid.read_config import config_data, config_archive
+from supersid.config.read_config import config_data, config_archive
 from sunpy.time import parse_time
-from supersid.vlf_transmitter_dict import transmitters
+from supersid.transmitters.vlf_transmitters import transmitters
 
 
 class VLFClient:

@@ -13,7 +13,7 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-from supersid.read_config import config_archive
+from supersid.config.read_config import config_archive
 
 
 class Archiver:
