@@ -114,8 +114,8 @@ class Archiver:
         Verifies and generates static paths for Dunsink and Birr summary
         plots.
         """
-        bir_summary = (Path(config_archive) / 'birr' / 'summary')
-        dun_summary = (Path(config_archive) / 'dunsink' / 'summary')
+        bir_summary = (Path(config_archive) / 'birr' / 'live')
+        dun_summary = (Path(config_archive) / 'dunsink' / 'live')
         if not os.path.exists(bir_summary):
             os.system('mkdir ' + str(bir_summary))
         if not os.path.exists(dun_summary):

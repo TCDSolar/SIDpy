@@ -75,3 +75,5 @@ def process_directory():
             print(file, ": Has been processed and archived.")
         else:
             print(file, ": Could not be processed, please try again later.")
+
+process_directory()

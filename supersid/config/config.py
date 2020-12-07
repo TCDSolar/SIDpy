@@ -11,10 +11,10 @@ parameters must be initialised correctly in order for the code to run.
 ### [PARAMETERS] ###
 
 # Path to the file directory locating the raw csv data you wish to process.
-data_path = 'C:/Users/oscar/Desktop/temp'
+data_path = 'C:/Users/oscar/OneDrive/Desktop/temp'
 
 # Output path of archive - archive will be generated within the specified directory.
-archive_path = 'C:/Users/oscar/Desktop/SuperSid/data'
+archive_path = 'C:/Users/oscar/OneDrive/Desktop/SuperSid/data'
 
 ### [TRANSMITTERS] ###
 
@@ -23,13 +23,13 @@ archive_path = 'C:/Users/oscar/Desktop/SuperSid/data'
 # sunrise and sunset times.
 
 transmitters = {
-    'JJI': [32.082, 130.828],
-    'NDT': [32.082, 130.828],
-    'NAA': [44.644, -67.282],
-    'FTA': [48.545, 2.579],
-    'VTX4': [8.387, 77.753],
-    'DHO38': [53.079, 7.615],
-    'DH038': [53.079, 7.615],
-    'SRC': [57.113, 12.397],
-    'NRK': [63.850, 22.467]
+    'JJI': [32.082, 130.828, 'Ebino, Japan'],
+    'NDT': [32.082, 130.828, 'Ebino, Japan'],
+    'NAA': [44.644, -67.282, 'Maine, USA'],
+    'FTA': [48.545, 2.579, 'Sainte-Assise, France'],
+    'VTX4': [8.387, 77.753, 'Vijayanarayanam, India'],
+    'DHO38': [53.079, 7.615, 'Rhauderfehn, Germany'],
+    'DH038': [53.079, 7.615, 'Rhauderfehn, Germany'],
+    'SRC': [57.113, 12.397, 'Grimeton, Sweden'],
+    'NRK': [63.850, 22.467, 'Keflavik, Iceland']
 }
