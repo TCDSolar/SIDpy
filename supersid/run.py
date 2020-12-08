@@ -12,6 +12,7 @@ their specified locations.
 import os
 import shutil
 from pathlib import Path
+import urllib.request,urllib.parse,urllib.error
 
 from supersid.config.config import data_path as config_data, archive_path as config_archive
 from supersid.archiver import Archiver
@@ -68,7 +69,10 @@ def process_directory():
     """
     vlfclient, archiver = VLFClient(), Archiver(temp_data_path=None)
     archiver.static_summary_path()
-    vlfclient.summary_plot()
+    try:
+        vlfclient.summary_plot()
+    except urllib.error.URLError:
+        pass
     for file in os.listdir(config_data):
         status, temp_image = process_file(config_data + "/" + file)
         if status == True:
@@ -76,4 +80,4 @@ def process_directory():
         else:
             print(file, ": Could not be processed, please try again later.")
 
-process_directory()
+#process_directory() # For development purposes

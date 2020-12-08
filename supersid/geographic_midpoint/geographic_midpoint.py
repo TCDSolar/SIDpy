@@ -11,7 +11,7 @@ midpoint.
 
 import math
 
-import astral
+from astral import Observer, sun
 
 
 class Geographic_Midpoint:
@@ -145,7 +145,7 @@ class Geographic_Midpoint:
         sunset : datetime
             Sunset time.
         """
-        astra = astral.Astral()
-        sunrise = astra.sunrise_utc(date, lat, lon)
-        sunset = astra.sunset_utc(date, lat, lon)
+        obs = Observer(latitude=lat, longitude=lon, elevation=0.0)
+        sunrise = sun.sunrise(observer=obs, date=date)
+        sunset = sun.sunset(observer=obs, date=date)
         return sunrise, sunset
