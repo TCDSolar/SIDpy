@@ -68,9 +68,9 @@ class Archiver:
                                        '%Y-%m-%d%H:%M:%S')
         path_info = {'transmitter': parameters_dict['StationID'],
                      'site': parameters_dict['Site'],
-                     'year': start_time.year,
-                     'month': start_time.month,
-                     'day': start_time.day}
+                     'year': start_time.strftime('%Y'),
+                     'month': start_time.strftime('%m'),
+                     'day': start_time.strftime('%d')}
         return path_info
 
     def create_path(self, path_info):
