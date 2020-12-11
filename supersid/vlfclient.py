@@ -166,7 +166,7 @@ class VLFClient:
         latlon = geo.calc_midpoint([float(parameters['Latitude']),
                                     float(parameters['Longitude'])],
                                    [transmitters[parameters['StationID']][0],
-                                    transmitters[parameters['StationID']][0]])
+                                    transmitters[parameters['StationID']][1]])
         sunrise, sunset = geo.sunrise_sunset(date_time_obj.date(), latlon[0],
                                              latlon[1])
         ax1.axvspan(sunrise - timedelta(hours=1), sunrise + timedelta(hours=1),
@@ -241,7 +241,8 @@ class VLFClient:
 
                 latlon = geo.calc_midpoint([float(header['Latitude']),
                                             float(header['Longitude'])],
-                                           transmitters[header['StationID']])
+                                           [transmitters[header['StationID']][0],
+                                            transmitters[header['StationID']][1]])
                 sunrise, sunset = geo.sunrise_sunset(date_time_obj.date(), latlon[0],
                                                      latlon[1])
                 ax[0].axvspan(sunrise - timedelta(hours=1), sunrise + timedelta(hours=1),
