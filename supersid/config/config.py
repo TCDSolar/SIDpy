@@ -31,5 +31,8 @@ transmitters = {
     'DHO38': [53.079, 7.615, 'Rhauderfehn, Germany'],
     'DH038': [53.079, 7.615, 'Rhauderfehn, Germany'],
     'SRC': [57.113, 12.397, 'Grimeton, Sweden'],
-    'NRK': [63.850, 22.467, 'Keflavik, Iceland']
+    'NRK': [63.850, 22.467, 'Keflavik, Iceland'],
+    'TBB': [37.409, 27.325, 'Bafa, Turkey'],
+    'JXN': [66.982, 13.872, 'Gildeskål, Norway'],
+    'ICV': [40.923, 9.732, 'Sardinia, Italy']
 }
