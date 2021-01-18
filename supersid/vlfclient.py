@@ -183,7 +183,7 @@ class VLFClient:
             ax1.axvline(t_start.replace(minute=0, second=0, microsecond=0) + timedelta(hours=t),
                         color="grey", ls="dashed", lw=0.5)
         ax1.text(0.91, 0.03, 'Generated : ' + datetime.utcnow().strftime('%H:%M:%S'), horizontalalignment='center',
-                verticalalignment='center', transform=ax1.transAxes, fontsize=8, weight='bold')
+                 verticalalignment='center', transform=ax1.transAxes, fontsize=8, weight='bold')
         dpi = fig.get_dpi()
         fig.set_size_inches(1000 / float(dpi), 500 / float(dpi))
         image_path = (config_data + "/" + file_path[len(config_data) + 1:-4])
@@ -255,7 +255,9 @@ class VLFClient:
                 ax[0].plot(sid, color='k')
 
                 ax[0].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))
-                ax[1].text(0.91, 0.03, 'Generated : ' + datetime.utcnow().strftime('%H:%M:%S'), horizontalalignment='center', verticalalignment = 'center', transform=ax[1].transAxes, fontsize=8, weight='bold')
+                ax[1].text(0.91, 0.03, 'Generated : ' + datetime.utcnow().strftime('%H:%M:%S'),
+                           horizontalalignment='center', verticalalignment='center', transform=ax[1].transAxes,
+                           fontsize=8, weight='bold')
 
                 ax[1].plot(gl, color='r', label='1.0-8.0 $\AA$')
                 ax[1].plot(gs, color='b', label='0.5-4.0 $\AA$')
@@ -279,7 +281,9 @@ class VLFClient:
                 ymin, ymax = ax[0].get_ylim()
                 ax[0].text(sunrise - timedelta(minutes=57), ymax - 1.5, 'Local Sunrise', fontsize=6, weight='bold')
                 ax[0].text(sunset - timedelta(minutes=54), ymax - 1.5, 'Local Sunset', fontsize=6, weight='bold')
-                ax[0].set_title('SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' + header['StationID'] + ' (' + transmitters[header['StationID']][2] + ', ' + header['Frequency'] + 'Hz' + ')')
+                ax[0].set_title(
+                    'SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' + header['StationID'] + ' (' +
+                    transmitters[header['StationID']][2] + ', ' + header['Frequency'] + 'Hz' + ')')
 
                 fig.tight_layout()
                 plt.subplots_adjust(hspace=0.01)
