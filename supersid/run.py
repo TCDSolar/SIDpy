@@ -86,4 +86,4 @@ def process_directory():
         except ValueError:
             print("Sun is always above the horizon on this day, at this location.")
 
-process_directory() # For development purposes
+#process_directory() # For development purposes
