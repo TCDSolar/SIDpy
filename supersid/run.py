@@ -73,17 +73,12 @@ def process_directory():
         vlfclient.summary_plot()
     except urllib.error.URLError:
         pass
-    except ValueError:
-        print("Sun is always above the horizon on this day, at this location.")
 
     for file in os.listdir(config_data):
-        try:
-            status, temp_image = process_file(config_data + "/" + file)
-            if status == True:
-                print(file, ": Has been processed and archived.")
-            else:
-                print(file, ": Could not be processed, please try again later.")
-        except ValueError:
-            print("Sun is always above the horizon on this day, at this location.")
+        status, temp_image = process_file(config_data + "/" + file)
+        if status == True:
+            print(file, ": Has been processed and archived.")
+        else:
+            print(file, ": Could not be processed, please try again later.")
 
 #process_directory() # For development purposes

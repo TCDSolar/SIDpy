@@ -167,15 +167,18 @@ class VLFClient:
                                     float(parameters['Longitude'])],
                                    [transmitters[parameters['StationID']][0],
                                     transmitters[parameters['StationID']][1]])
-        sunrise, sunset = geo.sunrise_sunset(date_time_obj.date(), latlon[0],
-                                             latlon[1])
-        ax1.axvspan(sunrise - timedelta(hours=1), sunrise + timedelta(hours=1),
-                    alpha=0.25, color='orange')
-        ax1.axvspan(sunset - timedelta(hours=1), sunset + timedelta(hours=1),
-                    alpha=0.25, color='red')
-        ymin, ymax = ax1.get_ylim()
-        ax1.text(sunrise - timedelta(minutes=59), ymax - 1, 'Local Sunrise', fontsize=7, weight='bold')
-        ax1.text(sunset - timedelta(minutes=54), ymax - 1, 'Local Sunset', fontsize=7, weight='bold')
+        try:
+            sunrise, sunset = geo.sunrise_sunset(date_time_obj.date(), latlon[0],
+                                                 latlon[1])
+            ax1.axvspan(sunrise - timedelta(hours=1), sunrise + timedelta(hours=1),
+                        alpha=0.25, color='orange')
+            ax1.axvspan(sunset - timedelta(hours=1), sunset + timedelta(hours=1),
+                        alpha=0.25, color='red')
+            ymin, ymax = ax1.get_ylim()
+            ax1.text(sunrise - timedelta(minutes=59), ymax - 1, 'Local Sunrise', fontsize=7, weight='bold')
+            ax1.text(sunset - timedelta(minutes=54), ymax - 1, 'Local Sunset', fontsize=7, weight='bold')
+        except ValueError:
+            print("Sun is always above the horizon on this day, at this location.")
         t_start = date_time_obj.replace(hour=0, minute=0, second=0, microsecond=0)
         t_end = date_time_obj.replace(hour=23, minute=59, second=59, microsecond=59)
         ax1.set_xlim(t_start, t_end)
@@ -243,12 +246,18 @@ class VLFClient:
                                             float(header['Longitude'])],
                                            [transmitters[header['StationID']][0],
                                             transmitters[header['StationID']][1]])
-                sunrise, sunset = geo.sunrise_sunset(date_time_obj.date(), latlon[0],
-                                                     latlon[1])
-                ax[0].axvspan(sunrise - timedelta(hours=1), sunrise + timedelta(hours=1),
-                              alpha=0.25, color='orange')
-                ax[0].axvspan(sunset - timedelta(hours=1), sunset + timedelta(hours=1),
-                              alpha=0.25, color='red')
+                try:
+                    sunrise, sunset = geo.sunrise_sunset(date_time_obj.date(), latlon[0],
+                                                         latlon[1])
+                    ax[0].axvspan(sunrise - timedelta(hours=1), sunrise + timedelta(hours=1),
+                                  alpha=0.25, color='orange')
+                    ax[0].axvspan(sunset - timedelta(hours=1), sunset + timedelta(hours=1),
+                                  alpha=0.25, color='red')
+                    ymin, ymax = ax[0].get_ylim()
+                    ax[0].text(sunrise - timedelta(minutes=57), ymax - 1.5, 'Local Sunrise', fontsize=6, weight='bold')
+                    ax[0].text(sunset - timedelta(minutes=54), ymax - 1.5, 'Local Sunset', fontsize=6, weight='bold')
+                except ValueError:
+                    print("Sun is always above the horizon on this day, at this location.")
 
                 sid = pd.Series(data['signal_strength'].values,
                                 index=pd.to_datetime(data['datetime']))
@@ -278,9 +287,6 @@ class VLFClient:
 
                 ax[1].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))
 
-                ymin, ymax = ax[0].get_ylim()
-                ax[0].text(sunrise - timedelta(minutes=57), ymax - 1.5, 'Local Sunrise', fontsize=6, weight='bold')
-                ax[0].text(sunset - timedelta(minutes=54), ymax - 1.5, 'Local Sunset', fontsize=6, weight='bold')
                 ax[0].set_title(
                     'SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' + header['StationID'] + ' (' +
                     transmitters[header['StationID']][2] + ', ' + header['Frequency'] + 'Hz' + ')')
