@@ -34,5 +34,6 @@ transmitters = {
     'NRK': [63.850, 22.467, 'Keflavik, Iceland'],
     'TBB': [37.409, 27.325, 'Bafa, Turkey'],
     'JXN': [66.982, 13.872, 'Gildeskål, Norway'],
-    'ICV': [40.923, 9.732, 'Sardinia, Italy']
+    'ICV': [40.923, 9.732, 'Sardinia, Italy'],
+    'HWU': [46.714 , 1.244, 'Rosnay, France']
 }
