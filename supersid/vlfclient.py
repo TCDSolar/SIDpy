@@ -156,8 +156,8 @@ class VLFClient:
                       parameters['StationID'] + ' (' +
                       transmitters[parameters['StationID']][2] +
                       ', ' + parameters['Frequency'] + 'Hz' + ')')
+        ax1.xaxis.set_major_locator(dates.HourLocator(interval=2))
         ax1.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
-        ax1.xaxis.set_minor_formatter(dates.DateFormatter('%H:%M'))
         ax1.plot(time, signal, color='k')
 
         geo = Geographic_Midpoint()
@@ -170,19 +170,19 @@ class VLFClient:
         try:
             sunrise, sunset = geo.sunrise_sunset(date_time_obj.date(), latlon[0],
                                                  latlon[1])
-            ax1.axvspan(sunrise - timedelta(hours=1), sunrise + timedelta(hours=1),
+            ax1.axvspan(sunrise - timedelta(minutes=10), sunrise + timedelta(minutes=10),
                         alpha=0.25, color='orange')
-            ax1.axvspan(sunset - timedelta(hours=1), sunset + timedelta(hours=1),
+            ax1.axvspan(sunset - timedelta(minutes=10), sunset + timedelta(minutes=10),
                         alpha=0.25, color='red')
-            ymin, ymax = ax1.get_ylim()
-            ax1.text(sunrise - timedelta(minutes=59), ymax - 1, 'Local Sunrise', fontsize=7, weight='bold')
-            ax1.text(sunset - timedelta(minutes=54), ymax - 1, 'Local Sunset', fontsize=7, weight='bold')
+            #ymin, ymax = ax1.get_ylim()
+            #ax1.text(sunrise - timedelta(minutes=59), ymax - 1, 'Local Sunrise', fontsize=7, weight='bold')
+            #ax1.text(sunset - timedelta(minutes=54), ymax - 1, 'Local Sunset', fontsize=7, weight='bold')
         except ValueError:
             print("Sun is always above the horizon on this day, at this location.")
         t_start = date_time_obj.replace(hour=0, minute=0, second=0, microsecond=0)
         t_end = date_time_obj.replace(hour=23, minute=59, second=59, microsecond=59)
         ax1.set_xlim(t_start, t_end)
-        for t in [1.5, 3, 4.5, 6, 7.5, 9, 10.5, 12, 13.5, 15, 16.5, 18, 19.5, 21, 22.5]:
+        for t in [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]:
             ax1.axvline(t_start.replace(minute=0, second=0, microsecond=0) + timedelta(hours=t),
                         color="grey", ls="dashed", lw=0.5)
         ax1.text(0.91, 0.03, 'Generated : ' + datetime.utcnow().strftime('%H:%M:%S'), horizontalalignment='center',
@@ -249,13 +249,13 @@ class VLFClient:
                 try:
                     sunrise, sunset = geo.sunrise_sunset(date_time_obj.date(), latlon[0],
                                                          latlon[1])
-                    ax[0].axvspan(sunrise - timedelta(hours=1), sunrise + timedelta(hours=1),
+                    ax[0].axvspan(sunrise - timedelta(minutes=10), sunrise + timedelta(minutes=10),
                                   alpha=0.25, color='orange')
-                    ax[0].axvspan(sunset - timedelta(hours=1), sunset + timedelta(hours=1),
+                    ax[0].axvspan(sunset - timedelta(minutes=10), sunset + timedelta(minutes=10),
                                   alpha=0.25, color='red')
-                    ymin, ymax = ax[0].get_ylim()
-                    ax[0].text(sunrise - timedelta(minutes=57), ymax - 1.5, 'Local Sunrise', fontsize=6, weight='bold')
-                    ax[0].text(sunset - timedelta(minutes=54), ymax - 1.5, 'Local Sunset', fontsize=6, weight='bold')
+                    #ymin, ymax = ax[0].get_ylim()
+                    #ax[0].text(sunrise - timedelta(minutes=57), ymax - 1.5, 'Local Sunrise', fontsize=6, weight='bold')
+                    #ax[0].text(sunset - timedelta(minutes=54), ymax - 1.5, 'Local Sunset', fontsize=6, weight='bold')
                 except ValueError:
                     print("Sun is always above the horizon on this day, at this location.")
 
@@ -263,6 +263,7 @@ class VLFClient:
                                 index=pd.to_datetime(data['datetime']))
                 ax[0].plot(sid, color='k')
 
+                ax[0].xaxis.set_major_locator(dates.HourLocator(interval=2))
                 ax[0].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))
                 ax[1].text(0.91, 0.03, 'Generated : ' + datetime.utcnow().strftime('%H:%M:%S'),
                            horizontalalignment='center', verticalalignment='center', transform=ax[1].transAxes,
@@ -271,9 +272,10 @@ class VLFClient:
                 ax[1].plot(gl, color='r', label='1.0-8.0 $\AA$')
                 ax[1].plot(gs, color='b', label='0.5-4.0 $\AA$')
                 ax[1].set(yscale='log', ylim=[10 ** -9, 10 ** -2])
+                ax[1].set_yticks([10 ** -8, 10 ** -7, 10 ** -6, 10 ** -5, 10 ** -4, 10 ** -3])
 
                 for a in ax:
-                    for t in [1.5, 3, 4.5, 6, 7.5, 9, 10.5, 12, 13.5, 15, 16.5, 18, 19.5, 21, 22.5]:
+                    for t in [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]:
                         a.axvline(t_start.replace(minute=0, second=0, microsecond=0) + timedelta(hours=t),
                                   color="grey", ls="dashed", lw=0.5)
                     a.set_xlim(t_start, t_end)
@@ -285,7 +287,16 @@ class VLFClient:
                 ax[1].set_ylabel("Flux Wm$^{-2}$")
                 ax[1].set_xlabel("Time: " + t_start.strftime("%m/%d/%Y") + ' (UTC)')
 
+                ax[1].xaxis.set_major_locator(dates.HourLocator(interval=2))
                 ax[1].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))
+
+                ax2 = ax[1].twinx()
+                ax2.set(yscale='log', ylim=[10 ** -9, 10 ** -2])
+                ax2.set_yticks([3 * 10 ** -8, 3 * 10 ** -7, 3 * 10 ** -6, 3 * 10 ** -5, 3 * 10 ** -4])
+                for band in [1 * 10 ** -8, 1 * 10 ** -7, 1 * 10 ** -6, 1 * 10 ** -5, 1 * 10 ** -4]:
+                    ax2.axhline(band, color="grey", ls="dashed", lw=1)
+                ax2.set_yticklabels(['A', 'B', 'C', 'M', 'X'], fontsize=12)
+                ax2.tick_params(axis=u'both', which=u'both', length=0)
 
                 ax[0].set_title(
                     'SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' + header['StationID'] + ' (' +
