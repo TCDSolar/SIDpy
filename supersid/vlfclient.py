@@ -149,7 +149,7 @@ class VLFClient:
         time, signal = data.datetime.tolist(), data.signal_strength.tolist()
 
         fig, ax1 = plt.subplots(figsize=(9, 3))
-        ax1.set(xlabel='Time: (UTC)',
+        ax1.set(xlabel='Time: {:s} (UTC)'.format(time[0].strftime("%Y-%m-%d")),
                 ylabel='Signal Strength (dB)',
                 title='SuperSID (' + parameters['Site'] + ', ' +
                       parameters['Country'] + ') - ' +
