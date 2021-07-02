@@ -12,14 +12,15 @@ their specified locations.
 import os
 import shutil
 from pathlib import Path
-import urllib.request,urllib.parse,urllib.error
+import urllib.request, urllib.parse, urllib.error
+from datetime import datetime, timedelta
 
 from supersid.config.config import data_path as config_data, archive_path as config_archive
 from supersid.archiver import Archiver
 from supersid.vlfclient import VLFClient
 
 
-def process_file(file):
+def process_file(file, gl=None, gs=None):
     """
     Process single given csv file meeting the appropriate criteria, before
     saving the corresponding png and input csv to the appropriate archive
@@ -29,56 +30,53 @@ def process_file(file):
     ----------
     file : str
         File path.
+    gl : pandas.timeseries
+        GOES XRS Long data.
+    gs : pandas.timeseries
+        GOES XRS Short data.
 
     Returns
     -------
-    temp_image_path : str
+    image_path : str
         Temporary path of generated png.
     """
     if file.endswith('.csv') and not file.__contains__("current") and not file.__contains__(" "):
         vlfclient = VLFClient()
-        archiver = Archiver(file)
+
         dataframe = vlfclient.read_csv(file)
         header = vlfclient.get_header(dataframe)
         data = vlfclient.get_data(dataframe)
-        temp_image_path = vlfclient.create_plot(header, data, file)
-        archive_dict = archiver.archive(header)
-        shutil.move(temp_image_path,
-                    Path(config_archive) / str(archive_dict['image_path'])
-                                               / (file[len(config_data) + 1:-4] + '.png'))
-        shutil.move(file,
-                    Path(config_archive) / str(archive_dict['data_path'])
-                                               / file[len(config_data) + 1:])
-        return True, temp_image_path
-    else:
-        return False, None
+
+        if datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S') > datetime.utcnow() - timedelta(days=6):
+            image_path = vlfclient.create_plot_xrs(header, data, file, gl, gs)
+        else:
+            image_path = vlfclient.create_plot(header, data, file)
+
+        parents = [(Path(config_archive) / header['Site'].lower() / 'live'),
+                   (Path(config_archive) / header['Site'].lower() /
+                    datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S').strftime('%Y/%m/%d') / 'csv')]
+        for path in parents:
+            if not path.exists():
+                path.mkdir(parents=True)
+
+        shutil.copy(image_path, parents[0] / (header['StationID'] + '.png'))
+        shutil.move(Path(file), parents[1] / file.split('/')[-1])
+        return image_path
 
 
 def process_directory():
-    """
-    Function to be run hourly in order to process and archive all files listed
-    within the data_path specified within config.cfg.
-
-    Parameters
-    ----------
-    None
-
-    Returns
-    -------
-    None
-    """
+    """Function to be run hourly in order to process and archive all files listed
+    within the data_path specified within config.cfg."""
     vlfclient, archiver = VLFClient(), Archiver(temp_data_path=None)
     archiver.static_summary_path()
-    try:
-        vlfclient.summary_plot()
-    except urllib.error.URLError:
-        pass
+    gl, gs = vlfclient.get_recent_goes()
 
-    for file in os.listdir(config_data):
-        status, temp_image = process_file(config_data + "/" + file)
-        if status == True:
-            print(file, ": Has been processed and archived.")
-        else:
-            print(file, ": Could not be processed, please try again later.")
+    for directory in config_data:
+        for file in os.listdir(directory):
+            image = process_file(directory + "/" + file, gl, gs)
+            if image:
+                print(file, ": Has been processed and archived.")
+            else:
+                print(file, ": Could not be processed, please try again later.")
 
-#process_directory() # For development purposes
+# process_directory()  # For development purposes

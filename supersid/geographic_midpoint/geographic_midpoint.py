@@ -42,21 +42,22 @@ class Geographic_Midpoint:
         midpoint = self.to_latlon(x, y, z)
         return midpoint
 
-    def to_cart(self, lat, lon):
+    @staticmethod
+    def to_cart(lat, lon):
         """
         Convert lat and lon to 3D cartesian coords.
 
         Parameters
         ----------
-        lat : int
+        lat : float
             Point latitude.
-        lon : int
+        lon : float
             Point longitude.
 
         Returns
         -------
         cart : list
-            Cartessian coords; x, y, z.
+            Cartesian coords; x, y, z.
 
         """
         lat = lat * math.pi / 180.0
@@ -67,20 +68,21 @@ class Geographic_Midpoint:
         cart = [x, y, z]
         return cart
 
-    def weighted_avg_coord(self, point1, point2, w1=1, w2=1):
+    @staticmethod
+    def weighted_avg_coord(point1, point2, w1=1, w2=1):
         """
-        Find mean of two 3D cartessian points,
+        Find mean of two 3D Cartesian points,
         this may be weighted using w1 & w2.
 
         Parameters
         ----------
         point1 : list
-            3D cartessian coord.
+            3D Cartesian coord.
         point2 : list
-            3D cartessian coord.
-        w1 : int
+            3D Cartesian coord.
+        w1 : float
             Point1 weighting, default 1.
-        w2 : int
+        w2 : float
             Point1 weighting, default 2.
 
         Returns
@@ -98,24 +100,25 @@ class Geographic_Midpoint:
         z = (point1[2] * w1 + point2[2] * w2) / (w1 + w2)
         return x, y, z
 
-    def to_latlon(self, x, y, z):
+    @staticmethod
+    def to_latlon(x, y, z):
         """
-        Convert cartessian 3D point into lat and lon.
+        Convert Cartesian 3D point into lat and lon.
 
         Parameters
         ----------
-        x : int
+        x : float
             X position.
-        y : int
+        y : float
             Y position.
-        z : int
+        z : float
             Z position.
 
         Returns
         -------
-        lat : int
+        lat : float
             Point latitude.
-        lon : int
+        lon : float
             Point longitude.
 
         """
@@ -126,7 +129,8 @@ class Geographic_Midpoint:
         lon = lon * 180.0 / math.pi
         return lat, lon
 
-    def sunrise_sunset(self, date, lat, lon):
+    @staticmethod
+    def sunrise_sunset(date, lat, lon):
         """
         Calculate sunrise and sunset times in utc for given date,
         lat and lon.
@@ -134,9 +138,9 @@ class Geographic_Midpoint:
         ----------
         date : datetime.date
             Date in yyyy-mm-dd.
-        lat : int
+        lat : float
             Latitude.
-        lon : int
+        lon : float
             Longitude.
         Returns
         -------
