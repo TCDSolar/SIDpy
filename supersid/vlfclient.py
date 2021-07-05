@@ -150,9 +150,9 @@ class VLFClient:
             Pandas dataframe containing csv data.
         file_path : str
             Path to csv file.
-        gl : pandas.timeseries
+        gl : pandas.Series
             GOES XRS Long data.
-        gs : pandas.timeseries
+        gs : pandas.Series
             GOES XRS Short data.
 
         Returns

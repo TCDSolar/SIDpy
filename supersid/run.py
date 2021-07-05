@@ -30,9 +30,9 @@ def process_file(file, gl=None, gs=None):
     ----------
     file : str
         File path.
-    gl : pandas.timeseries
+    gl : pandas.Series
         GOES XRS Long data.
-    gs : pandas.timeseries
+    gs : pandas.Series
         GOES XRS Short data.
 
     Returns
