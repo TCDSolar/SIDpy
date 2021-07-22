@@ -45,21 +45,36 @@ def process_file(file, gl=None, gs=None):
 
         dataframe = vlfclient.read_csv(file)
         header = vlfclient.get_header(dataframe)
-        data = vlfclient.get_data(dataframe)
+
+        original_sid = False
+        if '-' in header['MonitorID']:
+            original_sid = True
+
+        data = vlfclient.get_data(dataframe, original_sid)
 
         if datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S') > datetime.utcnow() - timedelta(days=6):
-            image_path = vlfclient.create_plot_xrs(header, data, file, gl, gs)
+            image_path = vlfclient.create_plot_xrs(header, data, file, gl, gs, original_sid)
         else:
-            image_path = vlfclient.create_plot(header, data, file)
+            image_path = vlfclient.create_plot(header, data, file, original_sid)
 
-        parents = [(Path(config_archive) / header['Site'].lower() / 'live'),
-                   (Path(config_archive) / header['Site'].lower() /
-                    datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S').strftime('%Y/%m/%d') / 'csv')]
+        if True == original_sid:
+            parents = [(Path(config_archive) / header['Site'].lower() / 'live'),
+                       (Path(config_archive) / header['Site'].lower() / 'sid' /
+                        datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S').strftime('%Y/%m/%d') / 'csv')]
+        else:
+            parents = [(Path(config_archive) / header['Site'].lower() / 'live'),
+                       (Path(config_archive) / header['Site'].lower() / 'super_sid' /
+                        datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S').strftime('%Y/%m/%d') / 'csv')]
+
         for path in parents:
             if not path.exists():
                 path.mkdir(parents=True)
 
-        shutil.copy(image_path, parents[0] / (header['StationID'] + '.png'))
+        if True == original_sid:
+            shutil.copy(image_path, parents[0] / (header['StationID'] + 'sid.png'))
+        else:
+            shutil.copy(image_path, parents[0] / (header['StationID'] + 'super_sid.png'))
+
         shutil.move(Path(file), parents[1] / file.split('/')[-1])
         return image_path
 

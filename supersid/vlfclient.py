@@ -52,7 +52,7 @@ class VLFClient:
                          names=['datetime', 'signal_strength'])
         return df
 
-    def get_data(self, df):
+    def get_data(self, df, original_sid):
         """
         Generate new dataframe containing only datetime and signal
         intensity with comments removed.
@@ -61,6 +61,8 @@ class VLFClient:
         ----------
         df : object
             Pandas dataframe containing csv data.
+        original_sid : bool
+            Statement on whether SID or Supersid data is being used.
 
         Returns
         -------
@@ -70,7 +72,8 @@ class VLFClient:
         df = df[~df['datetime'].astype(str).str.startswith('#')]
         df['datetime'] = pd.to_datetime(df['datetime'],
                                         format='%Y-%m-%d %H:%M:%S')
-        df = self.db_data(df)
+        if original_sid == False:
+            df = self.db_data(df)
         return df
 
     @staticmethod
@@ -138,7 +141,7 @@ class VLFClient:
         gs = pd.Series(data_short["flux"].values, index=time_array)
         return gl, gs
 
-    def create_plot_xrs(self, header, data, file_path, gl, gs):
+    def create_plot_xrs(self, header, data, file_path, gl, gs, original_sid=False):
         """
         Generate plot for given parameters and data.
 
@@ -154,6 +157,8 @@ class VLFClient:
             GOES XRS Long data.
         gs : pandas.Series
             GOES XRS Short data.
+        original_sid : bool
+            Statement on whether SID or Supersid data is being used.
 
         Returns
         -------
@@ -206,20 +211,28 @@ class VLFClient:
         ax2.set_yticklabels(['A', 'B', 'C', 'M', 'X'], fontsize=12)
         ax2.tick_params(axis=u'both', which=u'both', length=0)
         # Create axis and plot labels.
-        ax[0].set_ylabel("Signal strength (dB)")
         ax[1].set_ylabel("Flux (Wm$^{-2}$)")
         ax[1].set_xlabel("Time: {:s} (UTC)".format(date_time_obj.strftime("%Y-%m-%d")))
-        ax[0].set_title('SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' +
-                        header['StationID'] + ' (' + transmitters[header['StationID']][2] +
-                        ', ' + header['Frequency'][0:-3] + '.' + header['Frequency'][2] +
-                        'kHz' + ')')
+        if original_sid == True:
+            ax[0].set_ylabel("Volts (V)")
+            ax[0].set_title('SuperSID (' + header['Site'] + ') - ' + header['StationID'] + ' (' +
+                            transmitters[header['StationID']][2] + ', ' + header['Frequency'][0:-3] +
+                            '.' + header['Frequency'][2] + 'kHz' + ')')
+            parent = (Path(config_archive) / header['Site'].lower() / 'sid' /
+                      date_time_obj.strftime('%Y/%m/%d') / 'png')
+        else:
+            ax[0].set_ylabel("Signal Strength (dB)")
+            ax[0].set_title('SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' +
+                            header['StationID'] + ' (' + transmitters[header['StationID']][2] +
+                            ', ' + header['Frequency'][0:-3] + ' kHz' + ')')
+            parent = (Path(config_archive) / header['Site'].lower() / 'super_sid' /
+                      date_time_obj.strftime('%Y/%m/%d') / 'png')
         # Configure image dimensions.
         plt.subplots_adjust(hspace=0.01)
         dpi = fig.get_dpi()
         fig.set_size_inches(1000 / float(dpi), 500 / float(dpi))
         fig.tight_layout()
         # Save figure to the archive.
-        parent = Path(config_archive) / header['Site'].lower() / date_time_obj.strftime('%Y/%m/%d') / 'png'
         image_path = parent / file_path.split('/')[-1][:-4]
         if not parent.exists():
             parent.mkdir(parents=True)
@@ -227,7 +240,7 @@ class VLFClient:
         plt.close()
         return Path(str(image_path) + '.png')
 
-    def create_plot(self, header, data, file_path):
+    def create_plot(self, header, data, file_path, original_sid=False):
         """
         Generate plot for given parameters and data.
 
@@ -239,6 +252,8 @@ class VLFClient:
             Pandas dataframe containing csv data.
         file_path : str
             Path to csv file.
+        original_sid : bool
+            Statement on whether SID or Supersid data is being used.
 
         Returns
         -------
@@ -270,20 +285,27 @@ class VLFClient:
                 horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,
                 fontsize=8)
         # Create axis and plot labels.
-        ax.set_ylabel("Signal strength (dB)")
-        ax.set_ylabel("Flux (Wm$^{-2}$)")
         ax.set_xlabel("Time: {:s} (UTC)".format(date_time_obj.strftime("%Y-%m-%d")))
-        ax.set_title('SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' +
-                     header['StationID'] + ' (' + transmitters[header['StationID']][2] +
-                     ', ' + header['Frequency'][0:-3] + '.' + header['Frequency'][2] +
-                     'kHz' + ')')
+        if original_sid == True:
+            ax.set_ylabel("Volts (V)")
+            ax.set_title('SuperSID (' + header['Site'] + ') - ' + header['StationID'] + ' (' +
+                            transmitters[header['StationID']][2] + ', ' + header['Frequency'][0:-3] +
+                            '.' + header['Frequency'][2] + 'kHz' + ')')
+            parent = (Path(config_archive) / header['Site'].lower() / 'sid' /
+                      date_time_obj.strftime('%Y/%m/%d') / 'png')
+        else:
+            ax.set_ylabel("Signal Strength (dB)")
+            ax.set_title('SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' +
+                            header['StationID'] + ' (' + transmitters[header['StationID']][2] +
+                            ', ' + header['Frequency'][0:-3] + ' kHz' + ')')
+            parent = (Path(config_archive) / header['Site'].lower() / 'super_sid' /
+                      date_time_obj.strftime('%Y/%m/%d') / 'png')
         # Configure image dimensions.
         plt.subplots_adjust(hspace=0.01)
         dpi = fig.get_dpi()
         fig.set_size_inches(1000 / float(dpi), 400 / float(dpi))
         fig.tight_layout()
         # Save figure to the archive.
-        parent = Path(config_archive) / header['Site'].lower() / date_time_obj.strftime('%Y/%m/%d') / 'png'
         image_path = parent / file_path.split('/')[-1][:-4]
         if not parent.exists():
             parent.mkdir(parents=True)
