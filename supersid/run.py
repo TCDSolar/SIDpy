@@ -71,9 +71,9 @@ def process_file(file, gl=None, gs=None):
                 path.mkdir(parents=True)
 
         if True == original_sid:
-            shutil.copy(image_path, parents[0] / (header['StationID'] + 'sid.png'))
+            shutil.copy(image_path, parents[0] / (header['StationID'] + '_SID.png'))
         else:
-            shutil.copy(image_path, parents[0] / (header['StationID'] + 'super_sid.png'))
+            shutil.copy(image_path, parents[0] / (header['StationID'] + '_SuperSID.png'))
 
         shutil.move(Path(file), parents[1] / file.split('/')[-1])
         return image_path
