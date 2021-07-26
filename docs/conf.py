@@ -9,12 +9,12 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'supersid'
+project = 'SIDpy'
 copyright = '2020, Oscar OHara'
 author = 'Oscar OHara'
 
 # The full version, including alpha/beta/rc tags
-from supersid import __version__
+from sidpy import __version__
 
 release = __version__
 is_development = '.dev' in __version__

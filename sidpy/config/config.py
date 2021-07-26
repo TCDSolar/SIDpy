@@ -1,5 +1,5 @@
 """
-Configuration file for the supersid processing scripts. The required
+Configuration file for the SIDpy processing scripts. The required
 parameters must be initialised correctly in order for the code to run.
 
 @author:

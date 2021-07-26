@@ -149,5 +149,5 @@ docs/_build
 docs/generated
 docs/api
 docs/whatsnew/latest_changelog.txt
-supersid/version.py
+sidpy/version.py
 htmlcov/

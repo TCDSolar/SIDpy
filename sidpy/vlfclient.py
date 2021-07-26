@@ -10,7 +10,7 @@ plot.
     oharao@tcd.ie
 """
 
-import os
+import logging
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -20,8 +20,8 @@ import pandas as pd
 from matplotlib import dates
 from sunpy.time import parse_time
 
-from supersid.config.config import archive_path as config_archive, transmitters
-from supersid.geographic_midpoint.geographic_midpoint import Geographic_Midpoint
+from sidpy.config.config import archive_path as config_archive, transmitters
+from sidpy.geographic_midpoint.geographic_midpoint import Geographic_Midpoint
 
 np.seterr(divide='ignore')
 pd.options.mode.chained_assignment = None
@@ -50,9 +50,11 @@ class VLFClient:
                          skipinitialspace=True,
                          delimiter=',',
                          names=['datetime', 'signal_strength'])
+        logging.debug('File %s read.', filename)
         return df
 
-    def get_data(self, df, original_sid):
+    @staticmethod
+    def get_data(df, original_sid):
         """
         Generate new dataframe containing only datetime and signal
         intensity with comments removed.
@@ -73,7 +75,8 @@ class VLFClient:
         df['datetime'] = pd.to_datetime(df['datetime'],
                                         format='%Y-%m-%d %H:%M:%S')
         if original_sid == False:
-            df = self.db_data(df)
+            df['signal_strength'] = 20 * np.log10(df['signal_strength'])
+        logging.debug('File data obtained.')
         return df
 
     @staticmethod
@@ -98,25 +101,8 @@ class VLFClient:
                 para = row.split('=')
                 if len(para) == 2:
                     parameters_dict[para[0]] = para[1]
+        logging.debug('File header obtained.')
         return parameters_dict
-
-    @staticmethod
-    def db_data(df):
-        """
-        Takes pandas dataframe and converts signal strength intensity to db.
-
-        Parameters
-        ----------
-        df : object
-            Pandas dataframe containing csv data.
-
-        Returns
-        -------
-        df : object
-            Pandas dataframe containing csv data in db.
-        """
-        df['signal_strength'] = 20 * np.log10(df['signal_strength'])
-        return df
 
     @staticmethod
     def get_recent_goes():
@@ -132,6 +118,7 @@ class VLFClient:
         """
         data = pd.read_json("https://services.swpc.noaa.gov/json" +
                             "/goes/primary/xrays-7-day.json")
+        logging.debug('GOES swpc xrays-7-day data acquired.')
         data_short = data[data["energy"] == "0.05-0.4nm"]
         data_long = data[data["energy"] == "0.1-0.8nm"]
         time_array = [parse_time(x).datetime for x in
@@ -139,6 +126,7 @@ class VLFClient:
 
         gl = pd.Series(data_long["flux"].values, index=time_array)
         gs = pd.Series(data_short["flux"].values, index=time_array)
+        logging.debug('GOES XRS data processed.')
         return gl, gs
 
     def create_plot_xrs(self, header, data, file_path, gl, gs, original_sid=False):
@@ -174,13 +162,11 @@ class VLFClient:
             ax[0].axvline(sunrise, alpha=0.5, ls="dashed", color='orange', label='Local Sunrise')
             ax[0].axvline(sunset, alpha=0.5, ls="dashed", color='red', label='Local Sunset')
         except ValueError:
-            print("Sun is always above the horizon on this day, at this location.")
+            logging.warning("Sun is always above the horizon on this day, at this location.")
         # Plot VLF data.
-
         sid = pd.Series(data['signal_strength'].values, index=pd.to_datetime(data['datetime']))
         if date_time_obj.date() == datetime.utcnow().date():
-            sid = sid.truncate(after=datetime.utcnow().replace(minute=0, second=0)
-                                     - timedelta(seconds=20))
+            sid = sid.truncate(after= len(sid)- 20)
         ax[0].plot(sid, color='k')
         ax[0].xaxis.set_major_locator(dates.HourLocator(interval=2))
         ax[0].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))
@@ -215,7 +201,7 @@ class VLFClient:
         ax[1].set_xlabel("Time: {:s} (UTC)".format(date_time_obj.strftime("%Y-%m-%d")))
         if original_sid == True:
             ax[0].set_ylabel("Volts (V)")
-            ax[0].set_title('SuperSID (' + header['Site'] + ') - ' + header['StationID'] + ' (' +
+            ax[0].set_title('SID (' + header['Site'] + ') - ' + header['StationID'] + ' (' +
                             transmitters[header['StationID']][2] + ', ' + header['Frequency'][0:-3] +
                             '.' + header['Frequency'][2] + 'kHz' + ')')
             parent = (Path(config_archive) / header['Site'].lower() / 'sid' /
@@ -238,6 +224,7 @@ class VLFClient:
             parent.mkdir(parents=True)
         fig.savefig(fname=image_path)
         plt.close()
+        logging.debug('%s generated', (file_path.split('/')[-1][:-4] + '.png'))
         return Path(str(image_path) + '.png')
 
     def create_plot(self, header, data, file_path, original_sid=False):
@@ -269,7 +256,7 @@ class VLFClient:
             ax.axvline(sunrise, alpha=0.5, ls="dashed", color='orange', label='Local Sunrise')
             ax.axvline(sunset, alpha=0.5, ls="dashed", color='red', label='Local Sunset')
         except ValueError:
-            print("Sun is always above the horizon on this day, at this location.")
+            logging.warning("Sun is always above the horizon on this day, at this location.")
         # Plot VLF data.
         sid = pd.Series(data['signal_strength'].values, index=pd.to_datetime(data['datetime']))
         ax.plot(sid, color='k')
@@ -288,16 +275,16 @@ class VLFClient:
         ax.set_xlabel("Time: {:s} (UTC)".format(date_time_obj.strftime("%Y-%m-%d")))
         if original_sid == True:
             ax.set_ylabel("Volts (V)")
-            ax.set_title('SuperSID (' + header['Site'] + ') - ' + header['StationID'] + ' (' +
-                            transmitters[header['StationID']][2] + ', ' + header['Frequency'][0:-3] +
-                            '.' + header['Frequency'][2] + 'kHz' + ')')
+            ax.set_title('SID (' + header['Site'] + ') - ' + header['StationID'] + ' (' +
+                         transmitters[header['StationID']][2] + ', ' + header['Frequency'][0:-3] +
+                         '.' + header['Frequency'][2] + 'kHz' + ')')
             parent = (Path(config_archive) / header['Site'].lower() / 'sid' /
                       date_time_obj.strftime('%Y/%m/%d') / 'png')
         else:
             ax.set_ylabel("Signal Strength (dB)")
             ax.set_title('SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' +
-                            header['StationID'] + ' (' + transmitters[header['StationID']][2] +
-                            ', ' + header['Frequency'][0:-3] + ' kHz' + ')')
+                         header['StationID'] + ' (' + transmitters[header['StationID']][2] +
+                         ', ' + header['Frequency'][0:-3] + ' kHz' + ')')
             parent = (Path(config_archive) / header['Site'].lower() / 'super_sid' /
                       date_time_obj.strftime('%Y/%m/%d') / 'png')
         # Configure image dimensions.
@@ -311,4 +298,5 @@ class VLFClient:
             parent.mkdir(parents=True)
         fig.savefig(fname=image_path)
         plt.close()
+        logging.debug('%s generated', (file_path.split('/')[-1][:-4] + '.png'))
         return Path(str(image_path) + '.png')
