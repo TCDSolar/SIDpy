@@ -53,7 +53,8 @@ class VLFClient:
         logging.debug('File %s read.', filename)
         return df
 
-    def get_data(self, df, original_sid):
+    @staticmethod
+    def get_data(df, original_sid):
         """
         Generate new dataframe containing only datetime and signal
         intensity with comments removed.
@@ -74,7 +75,7 @@ class VLFClient:
         df['datetime'] = pd.to_datetime(df['datetime'],
                                         format='%Y-%m-%d %H:%M:%S')
         if original_sid == False:
-            df = self.db_data(df)
+            df['signal_strength'] = 20 * np.log10(df['signal_strength'])
         logging.debug('File data obtained.')
         return df
 
@@ -102,24 +103,6 @@ class VLFClient:
                     parameters_dict[para[0]] = para[1]
         logging.debug('File header obtained.')
         return parameters_dict
-
-    @staticmethod
-    def db_data(df):
-        """
-        Takes pandas dataframe and converts signal strength intensity to db.
-
-        Parameters
-        ----------
-        df : object
-            Pandas dataframe containing csv data.
-
-        Returns
-        -------
-        df : object
-            Pandas dataframe containing csv data in db.
-        """
-        df['signal_strength'] = 20 * np.log10(df['signal_strength'])
-        return df
 
     @staticmethod
     def get_recent_goes():
@@ -183,8 +166,7 @@ class VLFClient:
         # Plot VLF data.
         sid = pd.Series(data['signal_strength'].values, index=pd.to_datetime(data['datetime']))
         if date_time_obj.date() == datetime.utcnow().date():
-            sid = sid.truncate(after=datetime.utcnow().replace(minute=0, second=0)
-                                     - timedelta(seconds=20))
+            sid = sid.truncate(after= len(sid)- 20)
         ax[0].plot(sid, color='k')
         ax[0].xaxis.set_major_locator(dates.HourLocator(interval=2))
         ax[0].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))

@@ -41,7 +41,7 @@ def process_file(file, gl=None, gs=None):
         Temporary path of generated png.
     """
     if file.endswith('.csv') and not file.__contains__("current") and not file.__contains__(" "):
-        vlfclient, archiver = VLFClient(), Archiver(temp_data_path=None)
+        vlfclient, archiver = VLFClient(), Archiver()
         logging.debug('The vlfclient and archiver have been initialised.')
 
         dataframe = vlfclient.read_csv(file)

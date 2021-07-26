@@ -9,7 +9,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'SuperSIDpy'
+project = 'SIDpy'
 copyright = '2020, Oscar OHara'
 author = 'Oscar OHara'
 

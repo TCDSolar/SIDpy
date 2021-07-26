@@ -24,8 +24,8 @@ class Archiver:
     is {site}/YYYY/MM/DD/{file_type}/.
     """
 
-    def __init__(self, temp_data_path):
-        self.temp_data_path = temp_data_path
+    def __init__(self, root=config_archive):
+        self.root = root
 
     def archive_path(self, header, original_sid):
         """
@@ -48,9 +48,9 @@ class Archiver:
         if original_sid == True:
             instrument = 'sid'
 
-        instra_path = (Path(config_archive) / header['Site'].lower() / instrument /
+        instra_path = (Path(self.root) / header['Site'].lower() / instrument /
                        datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S').strftime('%Y/%m/%d') / 'csv')
-        parents = [(Path(config_archive) / header['Site'].lower() / 'live'), instra_path]
+        parents = [(Path(self.root) / header['Site'].lower() / 'live'), instra_path]
         return parents
 
     def static_summary_path(self, site):
@@ -63,7 +63,7 @@ class Archiver:
             Site name.
         """
         site = site.lower().replace(' ', '_')
-        live_dir = (Path(config_archive) / site / 'live')
+        live_dir = (Path(self.root) / site / 'live')
         if not os.path.exists(live_dir):
             os.system('mkdir ' + str(live_dir))
             logging.debug('%s live directory created.', site)
