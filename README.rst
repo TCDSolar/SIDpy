@@ -1,6 +1,6 @@
-SuperSID
---------
-Collection of Python scripts used to process and archive data from the SuperSIDs at Birr and Dunsink.
+SIDpy
+-----
+Collection of Python scripts used to process and archive data from the SID and SuperSID receivers.
 Designed to be run on Windows 10. Requires Anaconda3.
 The scripts may be automatically run using Windows Task Scheduler. To do this, the processing_script.bat needs to be configured.
 
@@ -29,7 +29,7 @@ more information.
 Contributing
 ------------
 
-We love contributions! SuperSID is open source,
+We love contributions! SIDpy is open source,
 built on open source, and we'd love to have you hang out in our community.
 
 **Imposter syndrome disclaimer**: We want your help. No, really.

@@ -10,7 +10,6 @@ plot.
     oharao@tcd.ie
 """
 
-import os
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -21,8 +20,8 @@ import pandas as pd
 from matplotlib import dates
 from sunpy.time import parse_time
 
-from supersid.config.config import archive_path as config_archive, transmitters
-from supersid.geographic_midpoint.geographic_midpoint import Geographic_Midpoint
+from sidpy.config.config import archive_path as config_archive, transmitters
+from sidpy.geographic_midpoint.geographic_midpoint import Geographic_Midpoint
 
 np.seterr(divide='ignore')
 pd.options.mode.chained_assignment = None
@@ -243,7 +242,7 @@ class VLFClient:
             parent.mkdir(parents=True)
         fig.savefig(fname=image_path)
         plt.close()
-        logging.debug('%s generated', (file_path.split('/')[-1][:-4]+'.png'))
+        logging.debug('%s generated', (file_path.split('/')[-1][:-4] + '.png'))
         return Path(str(image_path) + '.png')
 
     def create_plot(self, header, data, file_path, original_sid=False):
@@ -295,15 +294,15 @@ class VLFClient:
         if original_sid == True:
             ax.set_ylabel("Volts (V)")
             ax.set_title('SID (' + header['Site'] + ') - ' + header['StationID'] + ' (' +
-                            transmitters[header['StationID']][2] + ', ' + header['Frequency'][0:-3] +
-                            '.' + header['Frequency'][2] + 'kHz' + ')')
+                         transmitters[header['StationID']][2] + ', ' + header['Frequency'][0:-3] +
+                         '.' + header['Frequency'][2] + 'kHz' + ')')
             parent = (Path(config_archive) / header['Site'].lower() / 'sid' /
                       date_time_obj.strftime('%Y/%m/%d') / 'png')
         else:
             ax.set_ylabel("Signal Strength (dB)")
             ax.set_title('SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' +
-                            header['StationID'] + ' (' + transmitters[header['StationID']][2] +
-                            ', ' + header['Frequency'][0:-3] + ' kHz' + ')')
+                         header['StationID'] + ' (' + transmitters[header['StationID']][2] +
+                         ', ' + header['Frequency'][0:-3] + ' kHz' + ')')
             parent = (Path(config_archive) / header['Site'].lower() / 'super_sid' /
                       date_time_obj.strftime('%Y/%m/%d') / 'png')
         # Configure image dimensions.
@@ -317,5 +316,5 @@ class VLFClient:
             parent.mkdir(parents=True)
         fig.savefig(fname=image_path)
         plt.close()
-        logging.debug('%s generated', (file_path.split('/')[-1][:-4]+'.png'))
+        logging.debug('%s generated', (file_path.split('/')[-1][:-4] + '.png'))
         return Path(str(image_path) + '.png')

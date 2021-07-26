@@ -13,12 +13,11 @@ import os
 import shutil
 import logging
 from pathlib import Path
-import urllib.request, urllib.parse, urllib.error
 from datetime import datetime, timedelta
 
-from supersid.config.config import data_path as config_data, archive_path as config_archive
-from supersid.archiver import Archiver
-from supersid.vlfclient import VLFClient
+from sidpy.config.config import data_path as config_data
+from sidpy.archiver import Archiver
+from sidpy.vlfclient import VLFClient
 
 
 def process_file(file, gl=None, gs=None):
@@ -50,6 +49,7 @@ def process_file(file, gl=None, gs=None):
 
         archiver.static_summary_path(header['Site'])
 
+        # Determine VLF receiver which is recording data.
         original_sid = False
         if '-' in header['MonitorID']:
             original_sid = True
@@ -61,15 +61,7 @@ def process_file(file, gl=None, gs=None):
         else:
             image_path = vlfclient.create_plot(header, data, file, original_sid)
 
-        if True == original_sid:
-            parents = [(Path(config_archive) / header['Site'].lower() / 'live'),
-                       (Path(config_archive) / header['Site'].lower() / 'sid' /
-                        datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S').strftime('%Y/%m/%d') / 'csv')]
-        else:
-            parents = [(Path(config_archive) / header['Site'].lower() / 'live'),
-                       (Path(config_archive) / header['Site'].lower() / 'super_sid' /
-                        datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S').strftime('%Y/%m/%d') / 'csv')]
-
+        parents = archiver.archive_path(header, original_sid)
         for path in parents:
             if not path.exists():
                 path.mkdir(parents=True)
@@ -79,7 +71,6 @@ def process_file(file, gl=None, gs=None):
         else:
             shutil.copy(image_path, parents[0] / (header['StationID'] + '_SuperSID.png'))
         logging.debug('PNGs copied to archive.')
-
         shutil.move(Path(file), parents[1] / file.split('/')[-1])
         logging.debug('CSVs moved to archive.')
         return image_path

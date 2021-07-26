@@ -9,12 +9,12 @@ and archive them accordingly. The default structure of the archive is
     oharao@tcd.ie
 """
 
-import os
 import logging
+import os
 from datetime import datetime
 from pathlib import Path
 
-from supersid.config.config import archive_path as config_archive
+from sidpy.config.config import archive_path as config_archive
 
 
 class Archiver:
@@ -26,6 +26,32 @@ class Archiver:
 
     def __init__(self, temp_data_path):
         self.temp_data_path = temp_data_path
+
+    def archive_path(self, header, original_sid):
+        """
+        Create archive path root taking into consideration the instrument and site.
+
+        Parameters
+        ----------
+        header : dict
+            Dictionary containing observation parameters, eg. transmitter freq.
+        original_sid : bool
+            Statement on whether SID or Supersid data is being used.
+
+        Returns
+        -------
+        parents : list
+            Containing live data path and %Y/%m/%d archive path.
+
+        """
+        instrument = 'super_sid'
+        if original_sid == True:
+            instrument = 'sid'
+
+        instra_path = (Path(config_archive) / header['Site'].lower() / instrument /
+                       datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S').strftime('%Y/%m/%d') / 'csv')
+        parents = [(Path(config_archive) / header['Site'].lower() / 'live'), instra_path]
+        return parents
 
     def static_summary_path(self, site):
         """
