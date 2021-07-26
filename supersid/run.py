@@ -42,10 +42,13 @@ def process_file(file, gl=None, gs=None):
         Temporary path of generated png.
     """
     if file.endswith('.csv') and not file.__contains__("current") and not file.__contains__(" "):
-        vlfclient = VLFClient()
+        vlfclient, archiver = VLFClient(), Archiver(temp_data_path=None)
+        logging.debug('The vlfclient and archiver have been initialised.')
 
         dataframe = vlfclient.read_csv(file)
         header = vlfclient.get_header(dataframe)
+
+        archiver.static_summary_path(header['Site'])
 
         original_sid = False
         if '-' in header['MonitorID']:
@@ -90,10 +93,7 @@ def process_directory():
     logging.getLogger('matplotlib.font_manager').disabled = True
     logging.info('Processing called.')
 
-    vlfclient, archiver = VLFClient(), Archiver(temp_data_path=None)
-    logging.debug('The vlfclient and archiver have been initialised.')
-
-    archiver.static_summary_path()
+    vlfclient = VLFClient()
     gl, gs = vlfclient.get_recent_goes()
 
     for directory in config_data:
