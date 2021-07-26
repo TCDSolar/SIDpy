@@ -11,6 +11,7 @@ their specified locations.
 
 import os
 import shutil
+import logging
 from pathlib import Path
 import urllib.request, urllib.parse, urllib.error
 from datetime import datetime, timedelta
@@ -74,15 +75,24 @@ def process_file(file, gl=None, gs=None):
             shutil.copy(image_path, parents[0] / (header['StationID'] + '_SID.png'))
         else:
             shutil.copy(image_path, parents[0] / (header['StationID'] + '_SuperSID.png'))
+        logging.debug('PNGs copied to archive.')
 
         shutil.move(Path(file), parents[1] / file.split('/')[-1])
+        logging.debug('CSVs moved to archive.')
         return image_path
 
 
 def process_directory():
     """Function to be run hourly in order to process and archive all files listed
     within the data_path specified within config.cfg."""
+    logging.basicConfig(filename='error.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s',
+                        datefmt='%Y/%m/%d %H:%M:%S')
+    logging.getLogger('matplotlib.font_manager').disabled = True
+    logging.info('Processing called.')
+
     vlfclient, archiver = VLFClient(), Archiver(temp_data_path=None)
+    logging.debug('The vlfclient and archiver have been initialised.')
+
     archiver.static_summary_path()
     gl, gs = vlfclient.get_recent_goes()
 
@@ -90,8 +100,9 @@ def process_directory():
         for file in os.listdir(directory):
             image = process_file(directory + "/" + file, gl, gs)
             if image:
-                print(file, ": Has been processed and archived.")
+                logging.debug('%s : Has been processed and archived.', file)
             else:
-                print(file, ": Could not be processed, please try again later.")
+                logging.warning('%s : Could not be processed.', file)
+    logging.info('Processing completed.')
 
-# process_directory()  # For development purposes
+process_directory()  # For development purposes

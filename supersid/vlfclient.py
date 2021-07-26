@@ -11,6 +11,7 @@ plot.
 """
 
 import os
+import logging
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -50,6 +51,7 @@ class VLFClient:
                          skipinitialspace=True,
                          delimiter=',',
                          names=['datetime', 'signal_strength'])
+        logging.debug('File %s read.', filename)
         return df
 
     def get_data(self, df, original_sid):
@@ -74,6 +76,7 @@ class VLFClient:
                                         format='%Y-%m-%d %H:%M:%S')
         if original_sid == False:
             df = self.db_data(df)
+        logging.debug('File data obtained.')
         return df
 
     @staticmethod
@@ -98,6 +101,7 @@ class VLFClient:
                 para = row.split('=')
                 if len(para) == 2:
                     parameters_dict[para[0]] = para[1]
+        logging.debug('File header obtained.')
         return parameters_dict
 
     @staticmethod
@@ -132,6 +136,7 @@ class VLFClient:
         """
         data = pd.read_json("https://services.swpc.noaa.gov/json" +
                             "/goes/primary/xrays-7-day.json")
+        logging.debug('GOES swpc xrays-7-day data acquired.')
         data_short = data[data["energy"] == "0.05-0.4nm"]
         data_long = data[data["energy"] == "0.1-0.8nm"]
         time_array = [parse_time(x).datetime for x in
@@ -139,6 +144,7 @@ class VLFClient:
 
         gl = pd.Series(data_long["flux"].values, index=time_array)
         gs = pd.Series(data_short["flux"].values, index=time_array)
+        logging.debug('GOES XRS data processed.')
         return gl, gs
 
     def create_plot_xrs(self, header, data, file_path, gl, gs, original_sid=False):
@@ -174,9 +180,8 @@ class VLFClient:
             ax[0].axvline(sunrise, alpha=0.5, ls="dashed", color='orange', label='Local Sunrise')
             ax[0].axvline(sunset, alpha=0.5, ls="dashed", color='red', label='Local Sunset')
         except ValueError:
-            print("Sun is always above the horizon on this day, at this location.")
+            logging.warning("Sun is always above the horizon on this day, at this location.")
         # Plot VLF data.
-
         sid = pd.Series(data['signal_strength'].values, index=pd.to_datetime(data['datetime']))
         if date_time_obj.date() == datetime.utcnow().date():
             sid = sid.truncate(after=datetime.utcnow().replace(minute=0, second=0)
@@ -238,6 +243,7 @@ class VLFClient:
             parent.mkdir(parents=True)
         fig.savefig(fname=image_path)
         plt.close()
+        logging.debug('%s generated', (file_path.split('/')[-1][:-4]+'.png'))
         return Path(str(image_path) + '.png')
 
     def create_plot(self, header, data, file_path, original_sid=False):
@@ -269,7 +275,7 @@ class VLFClient:
             ax.axvline(sunrise, alpha=0.5, ls="dashed", color='orange', label='Local Sunrise')
             ax.axvline(sunset, alpha=0.5, ls="dashed", color='red', label='Local Sunset')
         except ValueError:
-            print("Sun is always above the horizon on this day, at this location.")
+            logging.warning("Sun is always above the horizon on this day, at this location.")
         # Plot VLF data.
         sid = pd.Series(data['signal_strength'].values, index=pd.to_datetime(data['datetime']))
         ax.plot(sid, color='k')
@@ -311,4 +317,5 @@ class VLFClient:
             parent.mkdir(parents=True)
         fig.savefig(fname=image_path)
         plt.close()
+        logging.debug('%s generated', (file_path.split('/')[-1][:-4]+'.png'))
         return Path(str(image_path) + '.png')

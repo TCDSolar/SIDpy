@@ -10,6 +10,7 @@ and archive them accordingly. The default structure of the archive is
 """
 
 import os
+import logging
 from datetime import datetime
 from pathlib import Path
 
@@ -118,5 +119,7 @@ class Archiver:
         dun_summary = (Path(config_archive) / 'dunsink' / 'live')
         if not os.path.exists(bir_summary):
             os.system('mkdir ' + str(bir_summary))
+            logging.debug('Birr live directory created.')
         if not os.path.exists(dun_summary):
             os.system('mkdir ' + str(dun_summary))
+            logging.debug('Dunsink live directory created.')
