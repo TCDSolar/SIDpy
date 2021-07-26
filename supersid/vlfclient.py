@@ -215,7 +215,7 @@ class VLFClient:
         ax[1].set_xlabel("Time: {:s} (UTC)".format(date_time_obj.strftime("%Y-%m-%d")))
         if original_sid == True:
             ax[0].set_ylabel("Volts (V)")
-            ax[0].set_title('SuperSID (' + header['Site'] + ') - ' + header['StationID'] + ' (' +
+            ax[0].set_title('SID (' + header['Site'] + ') - ' + header['StationID'] + ' (' +
                             transmitters[header['StationID']][2] + ', ' + header['Frequency'][0:-3] +
                             '.' + header['Frequency'][2] + 'kHz' + ')')
             parent = (Path(config_archive) / header['Site'].lower() / 'sid' /
@@ -288,7 +288,7 @@ class VLFClient:
         ax.set_xlabel("Time: {:s} (UTC)".format(date_time_obj.strftime("%Y-%m-%d")))
         if original_sid == True:
             ax.set_ylabel("Volts (V)")
-            ax.set_title('SuperSID (' + header['Site'] + ') - ' + header['StationID'] + ' (' +
+            ax.set_title('SID (' + header['Site'] + ') - ' + header['StationID'] + ' (' +
                             transmitters[header['StationID']][2] + ', ' + header['Frequency'][0:-3] +
                             '.' + header['Frequency'][2] + 'kHz' + ')')
             parent = (Path(config_archive) / header['Site'].lower() / 'sid' /
