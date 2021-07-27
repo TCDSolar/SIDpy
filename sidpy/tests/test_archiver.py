@@ -1,3 +1,12 @@
+"""
+Python tests for archiver.py.
+
+@author:
+    Oscar Sage David O'Hara
+@email:
+    oharao@tcd.ie
+"""
+
 from sidpy.archiver import Archiver
 import pytest
 import os

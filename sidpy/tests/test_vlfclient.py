@@ -1,3 +1,12 @@
+"""
+Python tests for vlfclient.py.
+
+@author:
+    Oscar Sage David O'Hara
+@email:
+    oharao@tcd.ie
+"""
+
 from sidpy.vlfclient import VLFClient
 from sidpy.tests.test_archiver import create_tmpdir
 import pytest
