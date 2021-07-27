@@ -166,7 +166,8 @@ class VLFClient:
         # Plot VLF data.
         sid = pd.Series(data['signal_strength'].values, index=pd.to_datetime(data['datetime']))
         if date_time_obj.date() == datetime.utcnow().date():
-            sid = sid.truncate(after= len(sid)- 20)
+            sid.sort_index()
+            sid = sid.truncate(after=datetime.utcnow().replace(minute=0, second=0) - timedelta(seconds=20))
         ax[0].plot(sid, color='k')
         ax[0].xaxis.set_major_locator(dates.HourLocator(interval=2))
         ax[0].xaxis.set_major_formatter(dates.DateFormatter("%H:%M"))

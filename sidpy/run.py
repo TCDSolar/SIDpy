@@ -16,9 +16,11 @@ from pathlib import Path
 from datetime import datetime, timedelta
 
 from sidpy.config.config import data_path as config_data
+from sidpy.logger import init_logger
 from sidpy.archiver import Archiver
 from sidpy.vlfclient import VLFClient
 
+logger = logging.getLogger(__name__)
 
 def process_file(file, gl=None, gs=None):
     """
@@ -42,7 +44,7 @@ def process_file(file, gl=None, gs=None):
     """
     if file.endswith('.csv') and not file.__contains__("current") and not file.__contains__(" "):
         vlfclient, archiver = VLFClient(), Archiver()
-        logging.debug('The vlfclient and archiver have been initialised.')
+        logger.debug('The vlfclient and archiver have been initialised.')
 
         dataframe = vlfclient.read_csv(file)
         header = vlfclient.get_header(dataframe)
@@ -70,30 +72,30 @@ def process_file(file, gl=None, gs=None):
             shutil.copy(image_path, parents[0] / (header['StationID'] + '_SID.png'))
         else:
             shutil.copy(image_path, parents[0] / (header['StationID'] + '_SuperSID.png'))
-        logging.debug('PNGs copied to archive.')
+        logger.debug('PNGs copied to archive.')
         shutil.move(Path(file), parents[1] / file.split('/')[-1])
-        logging.debug('CSVs moved to archive.')
+        logger.debug('CSVs moved to archive.')
         return image_path
 
 
 def process_directory():
     """Function to be run hourly in order to process and archive all files listed
     within the data_path specified within config.cfg."""
-    logging.basicConfig(filename='error.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s',
-                        datefmt='%Y/%m/%d %H:%M:%S')
-    logging.getLogger('matplotlib.font_manager').disabled = True
-    logging.info('Processing called.')
+    init_logger()
+    logger.info('Processing called.')
+    try:
+        vlfclient = VLFClient()
+        gl, gs = vlfclient.get_recent_goes()
 
-    vlfclient = VLFClient()
-    gl, gs = vlfclient.get_recent_goes()
-
-    for directory in config_data:
-        for file in os.listdir(directory):
-            image = process_file(directory + "/" + file, gl, gs)
-            if image:
-                logging.debug('%s : Has been processed and archived.', file)
-            else:
-                logging.warning('%s : Could not be processed.', file)
-    logging.info('Processing completed.')
+        for directory in config_data:
+            for file in os.listdir(directory):
+                image = process_file(directory + "/" + file, gl, gs)
+                if image:
+                    logger.debug('%s : Has been processed and archived.', file)
+                else:
+                    logger.warning('%s : Could not be processed.', file)
+        logger.info('Processing completed.')
+    except Exception:
+        logger.exception("The following exception was raised:")
 
 process_directory()  # For development purposes
