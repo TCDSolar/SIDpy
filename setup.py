@@ -38,6 +38,7 @@ except Exception:
 
 setup(
     extras_require=extras,
+    include_package_data=True,
     use_scm_version={'write_to': os.path.join('sidpy', 'version.py'),
                      'write_to_template': VERSION_TEMPLATE},
 

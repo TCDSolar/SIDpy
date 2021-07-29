@@ -64,6 +64,6 @@ class Archiver:
         """
         site = site.lower().replace(' ', '_')
         live_dir = (Path(self.root) / site / 'live')
-        if not os.path.exists(live_dir):
-            os.system('mkdir ' + str(live_dir))
+        if not live_dir.exists():
+            os.makedirs(live_dir)
             logging.debug('%s live directory created.', site)

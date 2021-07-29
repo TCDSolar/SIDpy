@@ -16,8 +16,8 @@ from datetime import datetime
 
 @pytest.fixture(scope="session")
 def create_tmpdir(tmpdir_factory):
-    base = tmpdir_factory.mktemp("data", numbered=False)
-    return Path(base)
+    base = tmpdir_factory.mktemp("data")
+    return base
 
 
 @pytest.fixture(scope='session')
@@ -36,22 +36,21 @@ def header():
 
 @pytest.fixture(scope='session')
 def png_path(header, create_tmpdir):
-    file_path = Path('.') / 'data' / '20210703_000000_NAA_S-0055.csv'
     return (create_tmpdir / header['Site'].lower() / 'sid' /
             datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S').strftime('%Y/%m/%d') /
-            'png' / (str(file_path).split('\\')[-1].split('.')[0] + '.png'))
+            'png' / ('20210703_000000_NAA_S-0055.csv'.split('.')[0] + '.png'))
 
 
 def test_get_header(header):
     vlfclient = VLFClient()
-    df = vlfclient.read_csv(Path('.') / 'data' / '20210703_000000_NAA_S-0055.csv')
+    df = vlfclient.read_csv(Path(__file__).parent / 'data' / '20210703_000000_NAA_S-0055.csv')
     header_result = vlfclient.get_header(df)
     assert header_result == header
 
 
 def test_get_data():
     vlfclient = VLFClient()
-    df = vlfclient.read_csv(Path('.') / 'data' / '20210703_000000_NAA_S-0055.csv')
+    df = vlfclient.read_csv(Path(__file__).parent / 'data' / '20210703_000000_NAA_S-0055.csv')
     data = vlfclient.get_data(df, True)
     for i in range(data.index[0], data.index[-1]):
         assert data['datetime'][i].strftime('%Y-%m-%d %H:%M:%S') == df['datetime'][i]
@@ -60,7 +59,7 @@ def test_get_data():
 
 def test_create_plot(create_tmpdir, header, png_path):
     vlfclient = VLFClient()
-    file_path = Path('.') / 'data' / '20210703_000000_NAA_S-0055.csv'
+    file_path = Path(__file__).parent / 'data' / '20210703_000000_NAA_S-0055.csv'
     df = vlfclient.read_csv(file_path)
     df = df[~df['datetime'].astype(str).str.startswith('#')]
     df['datetime'] = pd.to_datetime(df['datetime'], format='%Y-%m-%d %H:%M:%S')
@@ -71,11 +70,11 @@ def test_create_plot(create_tmpdir, header, png_path):
 
 def test_create_plot_xrs(create_tmpdir, header, png_path):
     vlfclient = VLFClient()
-    file_path = Path('.') / 'data' / '20210703_000000_NAA_S-0055.csv'
+    file_path = Path(__file__).parent / 'data' / '20210703_000000_NAA_S-0055.csv'
     df = vlfclient.read_csv(file_path)
     df = df[~df['datetime'].astype(str).str.startswith('#')]
     df['datetime'] = pd.to_datetime(df['datetime'], format='%Y-%m-%d %H:%M:%S')
-    gl, gs = vlfclient.get_recent_goes(Path('.') / 'data' / 'xrays-3-day.json')
+    gl, gs = vlfclient.get_recent_goes(Path(__file__).parent / 'data' / 'xrays-3-day.json')
     image_path = vlfclient.create_plot_xrs(header, df, file_path=str(file_path).split('\\')[-1], gl=gl, gs=gs,
                                            archive_path=str(create_tmpdir), original_sid=True)
     assert image_path == png_path
