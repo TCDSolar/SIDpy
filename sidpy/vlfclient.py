@@ -29,6 +29,10 @@ pd.options.mode.chained_assignment = None
 
 class VLFClient:
     """
+    Client containing functions specific to the processing of SuperSID VLF data;
+    reading csv files, get data from csv, get header information from csv,
+    normalize data, convert data to pandas DataFrame, plot data and create summary
+    plot.
     """
 
     @staticmethod
@@ -105,9 +109,9 @@ class VLFClient:
         return parameters_dict
 
     @staticmethod
-    def get_recent_goes():
+    def get_recent_goes(file="https://services.swpc.noaa.gov/json/goes/primary/xrays-7-day.json"):
         """
-        Pull the most recent GOES X-ray data from the NOAA page
+        Process GOES XRS files defaults to most recent GOES X-ray data from the NOAA page.
 
         Returns
         -------
@@ -116,8 +120,7 @@ class VLFClient:
         gs : pd.DataFrame object
                 The GOES short channels as pandas series
         """
-        data = pd.read_json("https://services.swpc.noaa.gov/json" +
-                            "/goes/primary/xrays-7-day.json")
+        data = pd.read_json(file)
         logging.debug('GOES swpc xrays-7-day data acquired.')
         data_short = data[data["energy"] == "0.05-0.4nm"]
         data_long = data[data["energy"] == "0.1-0.8nm"]
@@ -129,7 +132,8 @@ class VLFClient:
         logging.debug('GOES XRS data processed.')
         return gl, gs
 
-    def create_plot_xrs(self, header, data, file_path, gl, gs, original_sid=False):
+    @staticmethod
+    def create_plot_xrs(header, data, file_path, gl, gs, original_sid=False, archive_path=config_archive):
         """
         Generate plot for given parameters and data.
 
@@ -140,6 +144,8 @@ class VLFClient:
         data : object
             Pandas dataframe containing csv data.
         file_path : str
+            Path to archive.
+        archive_path : str
             Path to csv file.
         gl : pandas.Series
             GOES XRS Long data.
@@ -158,7 +164,7 @@ class VLFClient:
         geo = Geographic_Midpoint()
         date_time_obj = datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S')
         try:
-            sunrise, sunset = geo.sunrise_sunset(date_time_obj.date(), 53.33, 6.25)
+            sunrise, sunset = geo.sunrise_sunset(date_time_obj.date(), header['Latitude'], header['Longitude'])
             ax[0].axvline(sunrise, alpha=0.5, ls="dashed", color='orange', label='Local Sunrise')
             ax[0].axvline(sunset, alpha=0.5, ls="dashed", color='red', label='Local Sunset')
         except ValueError:
@@ -205,14 +211,14 @@ class VLFClient:
             ax[0].set_title('SID (' + header['Site'] + ') - ' + header['StationID'] + ' (' +
                             transmitters[header['StationID']][2] + ', ' + header['Frequency'][0:-3] +
                             '.' + header['Frequency'][2] + 'kHz' + ')')
-            parent = (Path(config_archive) / header['Site'].lower() / 'sid' /
+            parent = (Path(archive_path) / header['Site'].lower() / 'sid' /
                       date_time_obj.strftime('%Y/%m/%d') / 'png')
         else:
             ax[0].set_ylabel("Signal Strength (dB)")
             ax[0].set_title('SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' +
                             header['StationID'] + ' (' + transmitters[header['StationID']][2] +
                             ', ' + header['Frequency'][0:-3] + ' kHz' + ')')
-            parent = (Path(config_archive) / header['Site'].lower() / 'super_sid' /
+            parent = (Path(archive_path) / header['Site'].lower() / 'super_sid' /
                       date_time_obj.strftime('%Y/%m/%d') / 'png')
         # Configure image dimensions.
         plt.subplots_adjust(hspace=0.01)
@@ -228,7 +234,8 @@ class VLFClient:
         logging.debug('%s generated', (file_path.split('/')[-1][:-4] + '.png'))
         return Path(str(image_path) + '.png')
 
-    def create_plot(self, header, data, file_path, original_sid=False):
+    @staticmethod
+    def create_plot(header, data, file_path, original_sid=False, archive_path=config_archive):
         """
         Generate plot for given parameters and data.
 
@@ -240,6 +247,8 @@ class VLFClient:
             Pandas dataframe containing csv data.
         file_path : str
             Path to csv file.
+        archive_path : str
+            Path to archive.
         original_sid : bool
             Statement on whether SID or Supersid data is being used.
 
@@ -253,7 +262,7 @@ class VLFClient:
         geo = Geographic_Midpoint()
         date_time_obj = datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S')
         try:
-            sunrise, sunset = geo.sunrise_sunset(date_time_obj.date(), 53.33, 6.25)
+            sunrise, sunset = geo.sunrise_sunset(date_time_obj.date(), header['Latitude'], header['Longitude'])
             ax.axvline(sunrise, alpha=0.5, ls="dashed", color='orange', label='Local Sunrise')
             ax.axvline(sunset, alpha=0.5, ls="dashed", color='red', label='Local Sunset')
         except ValueError:
@@ -279,14 +288,14 @@ class VLFClient:
             ax.set_title('SID (' + header['Site'] + ') - ' + header['StationID'] + ' (' +
                          transmitters[header['StationID']][2] + ', ' + header['Frequency'][0:-3] +
                          '.' + header['Frequency'][2] + 'kHz' + ')')
-            parent = (Path(config_archive) / header['Site'].lower() / 'sid' /
+            parent = (Path(archive_path) / header['Site'].lower() / 'sid' /
                       date_time_obj.strftime('%Y/%m/%d') / 'png')
         else:
             ax.set_ylabel("Signal Strength (dB)")
             ax.set_title('SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' +
                          header['StationID'] + ' (' + transmitters[header['StationID']][2] +
                          ', ' + header['Frequency'][0:-3] + ' kHz' + ')')
-            parent = (Path(config_archive) / header['Site'].lower() / 'super_sid' /
+            parent = (Path(archive_path) / header['Site'].lower() / 'super_sid' /
                       date_time_obj.strftime('%Y/%m/%d') / 'png')
         # Configure image dimensions.
         plt.subplots_adjust(hspace=0.01)
