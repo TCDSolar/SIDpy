@@ -1,3 +1,12 @@
+"""
+Python tests for archiver.py.
+
+@author:
+    Oscar Sage David O'Hara
+@email:
+    oharao@tcd.ie
+"""
+
 from sidpy.archiver import Archiver
 import pytest
 import os
@@ -7,8 +16,8 @@ from datetime import datetime
 
 @pytest.fixture(scope="session")
 def create_tmpdir(tmpdir_factory):
-    base = tmpdir_factory.mktemp("data", numbered=False)
-    return Path(base)
+    base = tmpdir_factory.mktemp("data")
+    return base
 
 
 def test_archiver_archive_path():

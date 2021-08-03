@@ -20,7 +20,7 @@ from sidpy.logger import init_logger
 from sidpy.archiver import Archiver
 from sidpy.vlfclient import VLFClient
 
-logger = logging.getLogger(__name__)
+logger = init_logger()
 
 def process_file(file, gl=None, gs=None):
     """
@@ -81,7 +81,6 @@ def process_file(file, gl=None, gs=None):
 def process_directory():
     """Function to be run hourly in order to process and archive all files listed
     within the data_path specified within config.cfg."""
-    init_logger()
     logger.info('Processing called.')
     try:
         vlfclient = VLFClient()
