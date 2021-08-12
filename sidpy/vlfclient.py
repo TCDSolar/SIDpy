@@ -20,7 +20,7 @@ import pandas as pd
 from matplotlib import dates
 from sunpy.time import parse_time
 
-from sidpy.config.config import archive_path as config_archive, transmitters
+from sidpy.config.config import transmitters
 from sidpy.geographic_midpoint.geographic_midpoint import Geographic_Midpoint
 
 np.seterr(divide='ignore')
@@ -120,20 +120,23 @@ class VLFClient:
         gs : pd.DataFrame object
                 The GOES short channels as pandas series
         """
-        data = pd.read_json(file)
-        logging.debug('GOES swpc xrays-7-day data acquired.')
-        data_short = data[data["energy"] == "0.05-0.4nm"]
-        data_long = data[data["energy"] == "0.1-0.8nm"]
-        time_array = [parse_time(x).datetime for x in
-                      data_short['time_tag'].values]
+        try:
+            data = pd.read_json(file)
+            logging.debug('GOES swpc xrays-7-day data acquired.')
+            data_short = data[data["energy"] == "0.05-0.4nm"]
+            data_long = data[data["energy"] == "0.1-0.8nm"]
+            time_array = [parse_time(x).datetime for x in
+                          data_short['time_tag'].values]
 
-        gl = pd.Series(data_long["flux"].values, index=time_array)
-        gs = pd.Series(data_short["flux"].values, index=time_array)
-        logging.debug('GOES XRS data processed.')
-        return gl, gs
+            gl = pd.Series(data_long["flux"].values, index=time_array)
+            gs = pd.Series(data_short["flux"].values, index=time_array)
+            logging.debug('GOES XRS data processed.')
+            return gl, gs
+        except Exception:
+            return None, None
 
     @staticmethod
-    def create_plot_xrs(header, data, file_path, gl, gs, original_sid=False, archive_path=config_archive):
+    def create_plot_xrs(header, data, file_path, archive_path, gl, gs, original_sid=False):
         """
         Generate plot for given parameters and data.
 
@@ -153,6 +156,8 @@ class VLFClient:
             GOES XRS Short data.
         original_sid : bool
             Statement on whether SID or Supersid data is being used.
+        archive_path : str
+            Path to csv file.
 
         Returns
         -------
@@ -226,16 +231,16 @@ class VLFClient:
         fig.set_size_inches(1000 / float(dpi), 500 / float(dpi))
         fig.tight_layout()
         # Save figure to the archive.
-        image_path = parent / file_path.split('/')[-1][:-4]
+        image_path = parent / file_path.split('\\')[-1][:-4]
         if not parent.exists():
             parent.mkdir(parents=True)
         fig.savefig(fname=image_path)
         plt.close()
-        logging.debug('%s generated', (file_path.split('/')[-1][:-4] + '.png'))
+        logging.debug('%s generated', (file_path.split('\\')[-1][:-4] + '.png'))
         return Path(str(image_path) + '.png')
 
     @staticmethod
-    def create_plot(header, data, file_path, original_sid=False, archive_path=config_archive):
+    def create_plot(header, data, file_path, archive_path, original_sid=False):
         """
         Generate plot for given parameters and data.
 
@@ -303,10 +308,10 @@ class VLFClient:
         fig.set_size_inches(1000 / float(dpi), 400 / float(dpi))
         fig.tight_layout()
         # Save figure to the archive.
-        image_path = parent / file_path.split('/')[-1][:-4]
+        image_path = parent / file_path.split('\\')[-1][:-4]
         if not parent.exists():
             parent.mkdir(parents=True)
         fig.savefig(fname=image_path)
         plt.close()
-        logging.debug('%s generated', (file_path.split('/')[-1][:-4] + '.png'))
+        logging.debug('%s generated', (file_path.split('\\')[-1][:-4] + '.png'))
         return Path(str(image_path) + '.png')

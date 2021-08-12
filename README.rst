@@ -1,20 +1,45 @@
 SIDpy
 -----
-Collection of Python scripts used to process and archive data from the SID and SuperSID receivers.
-Designed to be run on Windows 10. Requires Anaconda3.
-The scripts may be automatically run using Windows Task Scheduler. To do this, the processing_script.bat needs to be configured.
+A Python 3 package aimed to process and archive Very Low Frequency Sudden Ionospheric Disturbance data produced by
+the `Stanford SuperSID & SolarSID Monitors <http://solar-center.stanford.edu/SID/sidmonitor/>`_. The config.py file must
+contain the correct data & archive directory paths in order to function as intended. Installation & configuration
+instructions alongside a "How To Guide" on the SIDpy package may be found below.
 
-Installation
-------------
-1. Clone repository to a convenient location eg. Desktop.
-2. Open Windows command prompt, and cd into the repo.
-3. Run "pip install requirements.txt"
-4. Open the supersid_config.py and change the corresponding paths to those which suit your machine. N.B. use absolute paths to ensure that windows scheduler can run the scripts.
-5. Running supersid_run.py will proceed to process all files in the specified path before archiving the png along with the corresponding csv.
+Installation Guide
+------------------
+1. Open the chosen OS terminal (Mac/Linux/Windows).
+2. For a local installation of the SIDpy package follow either 2a or 2b.
+    a. The package may be installed using pip directly from GitHub using the following terminal command:
+       `pip install git+https://github.com/TCDSolar/SIDpy`.
+    b. Using Git & the OS terminal the package may be cloned to a local directory. Navigate to the Sidpy directory root.
+       The package may then be installed using: `pip install .`.
+3. The package should now be installed within the current python environment. To verify `pip show sidpy` may be ran,
+   if an exception does not occur the SIDpy package is present and the installation has been successful.
 
 .. image:: http://img.shields.io/badge/powered%20by-SunPy-orange.svg?style=flat
     :target: http://www.sunpy.org
     :alt: Powered by SunPy Badge
+
+Transmitter Configuration
+-------------------------
+1. Open the chosen OS terminal (Mac/Linux/Windows).
+2. Run `pip show sidpy`
+    - Information on the local installation of the SIDpy package should be returned, including Name, Version, Summary,
+      Home-page, etc...
+    - If an Exception is raised the SIDpy package has not been properly installed to rectify this follow the steps
+      contained within the Instillation Guide outlined above.
+3. The location field specifies the directory where the local installation is held. Using your OS file explorer navigate
+   to this specified directory.
+4. From here open "./config/config.py".
+5. The Python dict `transmitters` contains the currently supported transmitters. If your data
+   set contains additional transmitters they must be added in the format:
+   `'{Transmitter_ID}': [{Latitude}, {Longitude}, '{Location}']`
+6. Additional `transmitters` may be added to the dictionary depending on the data being processed.
+
+How To Guide
+------------
+.. image:: https://github.com/oharao/SIDpy/tree/main/sidpy/tests/data/Dunsink_HWU_2021-04-22_000000.png
+    :target: https://vlf.ap.dias.ie/data/dunsink/super_sid/2021/04/22/png/
 
 License
 -------
