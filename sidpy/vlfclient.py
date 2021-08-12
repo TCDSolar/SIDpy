@@ -146,9 +146,9 @@ class VLFClient:
             Dictionary containing observation parameters, eg. transmitter freq.
         data : object
             Pandas dataframe containing csv data.
-        file_path : str
+        file_path : PosixPath
             Path to archive.
-        archive_path : str
+        archive_path : PosixPath
             Path to csv file.
         gl : pandas.Series
             GOES XRS Long data.
@@ -156,8 +156,7 @@ class VLFClient:
             GOES XRS Short data.
         original_sid : bool
             Statement on whether SID or Supersid data is being used.
-        archive_path : str
-            Path to csv file.
+
 
         Returns
         -------
@@ -217,27 +216,29 @@ class VLFClient:
                             transmitters[header['StationID']][2] + ', ' + header['Frequency'][0:-3] +
                             '.' + header['Frequency'][2] + 'kHz' + ')')
             parent = (Path(archive_path) / header['Site'].lower() / 'sid' /
-                      date_time_obj.strftime('%Y/%m/%d') / 'png')
+                      date_time_obj.strftime('%Y') / date_time_obj.strftime('%m') /
+                      date_time_obj.strftime('%d') / 'png')
         else:
             ax[0].set_ylabel("Signal Strength (dB)")
             ax[0].set_title('SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' +
                             header['StationID'] + ' (' + transmitters[header['StationID']][2] +
                             ', ' + header['Frequency'][0:-3] + ' kHz' + ')')
             parent = (Path(archive_path) / header['Site'].lower() / 'super_sid' /
-                      date_time_obj.strftime('%Y/%m/%d') / 'png')
+                      date_time_obj.strftime('%Y') / date_time_obj.strftime('%m') /
+                      date_time_obj.strftime('%d') / 'png')
         # Configure image dimensions.
         plt.subplots_adjust(hspace=0.01)
         dpi = fig.get_dpi()
         fig.set_size_inches(1000 / float(dpi), 500 / float(dpi))
         fig.tight_layout()
         # Save figure to the archive.
-        image_path = parent / file_path.split('\\')[-1][:-4]
+        image_path = (parent / file_path.name).with_suffix('.png')
         if not parent.exists():
             parent.mkdir(parents=True)
         fig.savefig(fname=image_path)
         plt.close()
-        logging.debug('%s generated', (file_path.split('\\')[-1][:-4] + '.png'))
-        return Path(str(image_path) + '.png')
+        logging.debug('%s generated', image_path.name)
+        return image_path
 
     @staticmethod
     def create_plot(header, data, file_path, archive_path, original_sid=False):
@@ -294,24 +295,26 @@ class VLFClient:
                          transmitters[header['StationID']][2] + ', ' + header['Frequency'][0:-3] +
                          '.' + header['Frequency'][2] + 'kHz' + ')')
             parent = (Path(archive_path) / header['Site'].lower() / 'sid' /
-                      date_time_obj.strftime('%Y/%m/%d') / 'png')
+                      date_time_obj.strftime('%Y') / date_time_obj.strftime('%m') /
+                      date_time_obj.strftime('%d') / 'png')
         else:
             ax.set_ylabel("Signal Strength (dB)")
             ax.set_title('SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' +
                          header['StationID'] + ' (' + transmitters[header['StationID']][2] +
                          ', ' + header['Frequency'][0:-3] + ' kHz' + ')')
             parent = (Path(archive_path) / header['Site'].lower() / 'super_sid' /
-                      date_time_obj.strftime('%Y/%m/%d') / 'png')
+                      date_time_obj.strftime('%Y') / date_time_obj.strftime('%m') /
+                      date_time_obj.strftime('%d') / 'png')
         # Configure image dimensions.
         plt.subplots_adjust(hspace=0.01)
         dpi = fig.get_dpi()
         fig.set_size_inches(1000 / float(dpi), 400 / float(dpi))
         fig.tight_layout()
         # Save figure to the archive.
-        image_path = parent / file_path.split('\\')[-1][:-4]
+        image_path = (parent / file_path.name).with_suffix('.png')
         if not parent.exists():
             parent.mkdir(parents=True)
         fig.savefig(fname=image_path)
         plt.close()
-        logging.debug('%s generated', (file_path.split('\\')[-1][:-4] + '.png'))
-        return Path(str(image_path) + '.png')
+        logging.debug('%s generated', (image_path.name))
+        return image_path
