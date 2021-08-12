@@ -64,7 +64,7 @@ def test_create_plot(create_tmpdir, header, png_path):
     df = df[~df['datetime'].astype(str).str.startswith('#')]
     df['datetime'] = pd.to_datetime(df['datetime'], format='%Y-%m-%d %H:%M:%S')
     image_path = vlfclient.create_plot(header, df, file_path=str(file_path).split('\\')[-1],
-                                       archive_path=str(create_tmpdir), original_sid=True)
+                                       archive_path=create_tmpdir, original_sid=True)
     assert image_path == png_path
 
 
@@ -75,6 +75,10 @@ def test_create_plot_xrs(create_tmpdir, header, png_path):
     df = df[~df['datetime'].astype(str).str.startswith('#')]
     df['datetime'] = pd.to_datetime(df['datetime'], format='%Y-%m-%d %H:%M:%S')
     gl, gs = vlfclient.get_recent_goes(Path(__file__).parent / 'data' / 'xrays-3-day.json')
-    image_path = vlfclient.create_plot_xrs(header, df, file_path=str(file_path).split('\\')[-1], gl=gl, gs=gs,
-                                           archive_path=str(create_tmpdir), original_sid=True)
+    image_path = vlfclient.create_plot_xrs(header, df, file_path=str(file_path).split('\\')[-1],
+                                           archive_path=create_tmpdir, gl=gl, gs=gs, original_sid=True)
     assert image_path == png_path
+
+
+#AssertionError: assert PosixPath('/home/vsts/work/1/s/.tox/py37/lib/python3.7/site-packages/sidpy/tests/data/20210703_000000_NAA_S-0055.png') == local('/tmp/pytest-of-vsts/pytest-0/data1/dunsink/sid/2021/07/03/png/20210703_000000_NAA_S-0055.png')
+

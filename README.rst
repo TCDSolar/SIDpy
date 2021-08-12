@@ -38,7 +38,7 @@ Transmitter Configuration
 
 How To Guide
 ------------
-.. image:: https://github.com/oharao/SIDpy/tree/main/sidpy/tests/data/Dunsink_HWU_2021-04-22_000000.png
+.. image:: https://raw.githubusercontent.com/TCDSolar/SIDpy/main/sidpy/tests/data/Dunsink_HWU_2021-04-22_000000.png
     :target: https://vlf.ap.dias.ie/data/dunsink/super_sid/2021/04/22/png/
 
 License
