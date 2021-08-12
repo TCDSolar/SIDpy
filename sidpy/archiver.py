@@ -14,6 +14,8 @@ import os
 from datetime import datetime
 from pathlib import Path
 
+from sidpy.config.config import archive_path as config_archive
+
 
 class Archiver:
     """
@@ -22,7 +24,7 @@ class Archiver:
     is {site}/YYYY/MM/DD/{file_type}/.
     """
 
-    def __init__(self, root):
+    def __init__(self, root=config_archive):
         self.root = root
 
     def archive_path(self, header, original_sid):
