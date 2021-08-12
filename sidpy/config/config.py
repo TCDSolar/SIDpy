@@ -8,6 +8,14 @@ parameters must be initialised correctly in order for the code to run.
     oharao@tcd.ie
 """
 
+### [PARAMETERS] ###
+
+# Paths to the file directories locating the raw csv data you wish to process.
+data_path = ['C:/Users/oscar/OneDrive/Desktop/temp/1', 'C:/Users/oscar/OneDrive/Desktop/temp/2']
+
+# Output path of archive - archive will be generated within the specified directory.
+archive_path = 'C:/Users/oscar/Desktop/SuperSid/data'
+
 ### [TRANSMITTERS] ###
 
 # Currently used vlf transmitter codes, with their corresponding latitude and

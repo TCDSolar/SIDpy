@@ -15,13 +15,14 @@ import logging
 from pathlib import Path
 from datetime import datetime, timedelta
 
+from sidpy.config.config import data_path as config_data
 from sidpy.logger import init_logger
 from sidpy.archiver import Archiver
 from sidpy.vlfclient import VLFClient
 
 logger = init_logger()
 
-def process_file(directory, filename, archive_path, gl=None, gs=None):
+def process_file(file, gl=None, gs=None):
     """
     Process single given csv file meeting the appropriate criteria, before
     saving the corresponding png and input csv to the appropriate archive
@@ -41,9 +42,8 @@ def process_file(directory, filename, archive_path, gl=None, gs=None):
     image_path : str
         Temporary path of generated png.
     """
-    file = str(Path(directory) / filename)
     if file.endswith('.csv') and not file.__contains__("current") and not file.__contains__(" "):
-        vlfclient, archiver = VLFClient(), Archiver(archive_path)
+        vlfclient, archiver = VLFClient(), Archiver()
         logger.debug('The vlfclient and archiver have been initialised.')
 
         dataframe = vlfclient.read_csv(file)
@@ -58,11 +58,10 @@ def process_file(directory, filename, archive_path, gl=None, gs=None):
 
         data = vlfclient.get_data(dataframe, original_sid)
 
-        if (datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S') > datetime.utcnow() - timedelta(days=6) and
-                gs != None):
-            image_path = vlfclient.create_plot_xrs(header, data, file, archive_path, gl, gs, original_sid)
+        if datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S') > datetime.utcnow() - timedelta(days=6):
+            image_path = vlfclient.create_plot_xrs(header, data, file, gl, gs, original_sid)
         else:
-            image_path = vlfclient.create_plot(header, data, file, archive_path, original_sid)
+            image_path = vlfclient.create_plot(header, data, file, original_sid)
 
         parents = archiver.archive_path(header, original_sid)
         for path in parents:
@@ -74,23 +73,22 @@ def process_file(directory, filename, archive_path, gl=None, gs=None):
         else:
             shutil.copy(image_path, parents[0] / (header['StationID'] + '_SuperSID.png'))
         logger.debug('PNGs copied to archive.')
-        shutil.move(Path(file), parents[1] / file.split('\\')[-1])
+        shutil.move(Path(file), parents[1] / file.split('/')[-1])
         logger.debug('CSVs moved to archive.')
         return image_path
 
 
-def process_directory(data_path, archive_path):
+def process_directory():
     """Function to be run hourly in order to process and archive all files listed
     within the data_path specified within config.cfg."""
-    logger.info('Processing called')
-    archive_path = Path(archive_path)
+    logger.info('Processing called.')
     try:
         vlfclient = VLFClient()
         gl, gs = vlfclient.get_recent_goes()
 
-        for directory in data_path:
-            for file in os.listdir(Path(directory)):
-                image = process_file(Path(directory), file, archive_path, gl, gs)
+        for directory in config_data:
+            for file in os.listdir(directory):
+                image = process_file(directory + "/" + file, gl, gs)
                 if image:
                     logger.debug('%s : Has been processed and archived.', file)
                 else:
@@ -99,5 +97,4 @@ def process_directory(data_path, archive_path):
     except Exception:
         logger.exception("The following exception was raised:")
 
-process_directory(['C:/Users/oscar/OneDrive/Desktop/temp/1', 'C:/Users/oscar/OneDrive/Desktop/temp/2'],
-                  'C:/Users/oscar/Desktop/SuperSid/data')  # For development purposes
+process_directory()  # For development purposes
