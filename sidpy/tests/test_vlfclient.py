@@ -81,4 +81,3 @@ def test_create_plot_xrs(create_tmpdir, header, png_path):
 
 
 #AssertionError: assert PosixPath('/home/vsts/work/1/s/.tox/py37/lib/python3.7/site-packages/sidpy/tests/data/20210703_000000_NAA_S-0055.png') == local('/tmp/pytest-of-vsts/pytest-0/data1/dunsink/sid/2021/07/03/png/20210703_000000_NAA_S-0055.png')
-
