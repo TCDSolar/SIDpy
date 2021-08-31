@@ -4,8 +4,6 @@ include setup.cfg
 include LICENSE.rst
 include pyproject.toml
 
-recursive-include sidpy/tests/data/test_data.tar.gz
-
 recursive-include sidpy *.pyx *.c *.pxd
 recursive-include docs *
 recursive-include licenses *
