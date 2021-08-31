@@ -9,9 +9,7 @@ their specified locations.
     oharao@tcd.ie
 """
 
-import os
 import shutil
-import logging
 from pathlib import Path
 from datetime import datetime, timedelta
 
@@ -21,7 +19,8 @@ from sidpy.vlfclient import VLFClient
 
 logger = init_logger()
 
-def process_file(directory, file, archive_path, gl=None, gs=None):
+
+def process_file(file_path, archive_path, gl=None, gs=None):
     """
     Process single given csv file meeting the appropriate criteria, before
     saving the corresponding png and input csv to the appropriate archive
@@ -29,7 +28,7 @@ def process_file(directory, file, archive_path, gl=None, gs=None):
 
     Parameters
     ----------
-    file : str
+    file_path : str
         File path.
     gl : pandas.Series
         GOES XRS Long data.
@@ -41,7 +40,6 @@ def process_file(directory, file, archive_path, gl=None, gs=None):
     image_path : str
         Temporary path of generated png.
     """
-    file_path = directory / file
     if (str(file_path).endswith('.csv') and not str(file_path).__contains__("current")
             and not str(file_path).__contains__(" ")):
         vlfclient, archiver = VLFClient(), Archiver(archive_path)
@@ -82,7 +80,15 @@ def process_file(directory, file, archive_path, gl=None, gs=None):
 
 def process_directory(data_path, archive_path):
     """Function to be run hourly in order to process and archive all files listed
-    within the data_path specified within config.cfg."""
+    within the data_path specified within config.cfg.
+
+    Parameters
+    ----------
+    data_path : str
+        Directory containing data to be processed.
+    archive_path : str
+        Directory whhere the data will be archived.
+    """
     logger.info('Processing called')
     archive_path = Path(archive_path)
     try:
@@ -92,7 +98,7 @@ def process_directory(data_path, archive_path):
         for directory in data_path:
             directory = Path(directory)
             for file in Path.iterdir(directory):
-                image = process_file(directory, file, archive_path, gl, gs)
+                image = process_file(directory / file, archive_path, gl, gs)
                 if image:
                     logger.debug('%s : Has been processed and archived.', file)
                 else:
@@ -101,5 +107,8 @@ def process_directory(data_path, archive_path):
     except Exception:
         logger.exception("The following exception was raised:")
 
+
+"""
 process_directory(['C:/Users/oscar/OneDrive/Desktop/temp/1', 'C:/Users/oscar/OneDrive/Desktop/temp/2'],
                   'C:/Users/oscar/Desktop/SuperSid/data')  # For development purposes
+"""
