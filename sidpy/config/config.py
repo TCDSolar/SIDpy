@@ -27,6 +27,7 @@ transmitters = {
     'TBB': [37.409, 27.325, 'Bafa, Turkey'],
     'JXN': [66.982, 13.872, 'Gildeskål, Norway'],
     'ICV': [40.923, 9.732, 'Sardinia, Italy'],
+    'HWU': [46.714, 1.244, 'Rosnay, France'],
     'HWU2': [46.714, 1.244, 'Rosnay, France'],
     'HWU1': [46.714, 1.244, 'Rosnay, France']
 }
