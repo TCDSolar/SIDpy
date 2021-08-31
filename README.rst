@@ -20,6 +20,15 @@ Installation Guide
     :target: http://www.sunpy.org
     :alt: Powered by SunPy Badge
 
+
+.. image:: https://dev.azure.com/OHARAO/SIDpy/_apis/build/status/TCDSolar.SIDpy?repoName=TCDSolar%2FSIDpy&branchName=main
+    :target: https://dev.azure.com/OHARAO/SIDpy/_build
+    :alt: Build Status
+
+.. image:: https://readthedocs.org/projects/sidpy/badge/?version=latest
+    :target: https://sidpy.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
 Transmitter Configuration
 -------------------------
 1. Open the chosen OS terminal (Mac/Linux/Windows).
@@ -38,8 +47,7 @@ Transmitter Configuration
 
 How To Guide
 ------------
-1. Follow the Installation Guide provided above to obtain a local version of SIDpy.
-2.
+
 .. image:: https://github.com/oharao/SIDpy/tree/main/sidpy/tests/data/Dunsink_HWU_2021-04-22_000000.png
     :target: https://vlf.ap.dias.ie/data/dunsink/super_sid/2021/04/22/png/
 
