@@ -10,11 +10,11 @@ their specified locations.
 """
 
 import shutil
-from pathlib import Path
 from datetime import datetime, timedelta
+from pathlib import Path
 
-from sidpy.logger import init_logger
 from sidpy.archiver import Archiver
+from sidpy.logger import init_logger
 from sidpy.vlfclient import VLFClient
 
 logger = init_logger()
@@ -58,7 +58,7 @@ def process_file(file_path, archive_path, gl=None, gs=None):
         data = vlfclient.get_data(dataframe, original_sid)
 
         if (datetime.strptime(header['UTC_StartTime'], '%Y-%m-%d%H:%M:%S') > datetime.utcnow() - timedelta(days=6) and
-                gs != None):
+                gs is not None):
             image_path = vlfclient.create_plot_xrs(header, data, file_path, archive_path, gl, gs, original_sid)
         else:
             image_path = vlfclient.create_plot(header, data, file_path, archive_path, original_sid)
@@ -108,7 +108,7 @@ def process_directory(data_path, archive_path):
         logger.exception("The following exception was raised:")
 
 
-"""
+""""
 process_directory(['C:/Users/oscar/OneDrive/Desktop/temp/1', 'C:/Users/oscar/OneDrive/Desktop/temp/2'],
                   'C:/Users/oscar/Desktop/SuperSid/data')  # For development purposes
 """
