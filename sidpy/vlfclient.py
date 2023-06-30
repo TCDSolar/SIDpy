@@ -56,10 +56,8 @@ class VLFClient:
                          delimiter=',',
                          names=['datetime', 'signal_strength'])
         logging.debug('File %s read.', filename)
-        
-
         return df
-     
+
     @staticmethod
     def get_data(df, original_sid):
         """
@@ -81,11 +79,11 @@ class VLFClient:
         df = df[~df['datetime'].astype(str).str.startswith('#')]
         try:
             df['datetime'] = pd.to_datetime(df['datetime'],
-                                        format='%Y-%m-%d %H:%M:%S')
+                                            format='%Y-%m-%d %H:%M:%S')
         except ValueError:
             df['datetime'] = pd.to_datetime(df['datetime'],
-                                        format='%Y-%m-%d %H:%M:%S.%f')
-            
+                                            format='%Y-%m-%d %H:%M:%S.%f')
+
         if original_sid == False:
             df['signal_strength'] = pd.to_numeric(df['signal_strength'])
             df['signal_strength'] = savgol_filter(df['signal_strength'], 9, 1)
