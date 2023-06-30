@@ -13,6 +13,7 @@ import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from sidpy.config.config import transmitters
 from sidpy.archiver import Archiver
 from sidpy.logger import init_logger
 from sidpy.vlfclient import VLFClient
@@ -40,8 +41,9 @@ def process_file(file_path, archive_path, gl=None, gs=None):
     image_path : str
         Temporary path of generated png.
     """
-    if (str(file_path).endswith('.csv') and not str(file_path).__contains__("current")
-            and not str(file_path).__contains__(" ")):
+    if (str(file_path).endswith('.csv') and any(i in str(file_path) for i in transmitters)
+                and not str(file_path).__contains__("current")
+                    and not str(file_path).__contains__(" ")):
         vlfclient, archiver = VLFClient(), Archiver(archive_path)
         logger.debug('The vlfclient and archiver have been initialised.')
 

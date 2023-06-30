@@ -22,6 +22,7 @@ from sunpy.time import parse_time
 
 from sidpy.config.config import transmitters
 from sidpy.geographic_midpoint.geographic_midpoint import Geographic_Midpoint
+from scipy.signal import savgol_filter
 
 np.seterr(divide='ignore')
 pd.options.mode.chained_assignment = None
@@ -76,9 +77,16 @@ class VLFClient:
             Pandas dataframe containing normalized csv data without comments.
         """
         df = df[~df['datetime'].astype(str).str.startswith('#')]
-        df['datetime'] = pd.to_datetime(df['datetime'],
-                                        format='%Y-%m-%d %H:%M:%S')
+        try:
+            df['datetime'] = pd.to_datetime(df['datetime'],
+                                            format='%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            df['datetime'] = pd.to_datetime(df['datetime'],
+                                            format='%Y-%m-%d %H:%M:%S.%f')
+
         if original_sid == False:
+            df['signal_strength'] = pd.to_numeric(df['signal_strength'])
+            df['signal_strength'] = savgol_filter(df['signal_strength'], 9, 1)
             df['signal_strength'] = 20 * np.log10(df['signal_strength'])
         logging.debug('File data obtained.')
         return df
@@ -213,7 +221,7 @@ class VLFClient:
         if original_sid == True:
             ax[0].set_ylabel("Volts (V)")
             ax[0].set_title('SID (' + header['Site'] + ') - ' + header['StationID'] + ' (' +
-                            transmitters[header['StationID']][2] + ', ' + header['Frequency'][0:-3] +
+                            transmitters[str(header['StationID'])][2] + ', ' + header['Frequency'][0:-3] +
                             '.' + header['Frequency'][2] + 'kHz' + ')')
             parent = (Path(archive_path) / header['Site'].lower() / 'sid' /
                       date_time_obj.strftime('%Y') / date_time_obj.strftime('%m') /
@@ -221,7 +229,7 @@ class VLFClient:
         else:
             ax[0].set_ylabel("Signal Strength (dB)")
             ax[0].set_title('SuperSID (' + header['Site'] + ', ' + header['Country'] + ') - ' +
-                            header['StationID'] + ' (' + transmitters[header['StationID']][2] +
+                            header['StationID'] + ' (' + transmitters[str(header['StationID'])][2] +
                             ', ' + header['Frequency'][0:-3] + ' kHz' + ')')
             parent = (Path(archive_path) / header['Site'].lower() / 'super_sid' /
                       date_time_obj.strftime('%Y') / date_time_obj.strftime('%m') /
